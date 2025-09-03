@@ -2,7 +2,7 @@ library ais_decoder;
 
 // base exports
 export 'src/messages/base/ais_message.dart';
-export 'package:ais_decoder/message_factory.dart';
+export '/message_factory.dart';
 export 'src/exceptions/ais_exceptions.dart';
 
 // src.messages

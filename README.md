@@ -100,7 +100,7 @@ This project is licensed under the BSD 3-Clause License - see the [LICENSE](LICE
 ## Acknowledgments
 
 - ITU-R M.1371-5 specification for AIS technical standards
-- GPSD project for AIS protocol documentation
+- [GPSD](https://gpsd.gitlab.io/gpsd/AIVDM.html) project for AIS protocol documentation
 - The maritime development community
 
 ---
