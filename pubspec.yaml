@@ -1,0 +1,40 @@
+name: ais_decoder
+description: >-
+  A comprehensive AIS (Automatic Identification System) message decoder for Dart and Flutter.
+  Decode NMEA AIS sentences into structured Dart objects for maritime applications.
+version: 0.1.0
+homepage: https://github.com/yourusername/ais_decoder
+repository: https://github.com/yourusername/ais_decoder
+issue_tracker: https://github.com/yourusername/ais_decoder/issues
+documentation: https://github.com/yourusername/ais_decoder#readme
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+# No dependencies needed - pure Dart implementation!
+dependencies:
+
+dev_dependencies:
+  # For testing (add when you write tests)
+  test: ^1.24.0
+
+  # For linting (optional but recommended)
+  lints: ^3.0.0
+
+# Topics help people discover your package
+topics:
+  - ais
+  - maritime
+  - nmea
+  - decoder
+  - navigation
+
+
+# Platforms your package supports
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  web:
+  windows:
