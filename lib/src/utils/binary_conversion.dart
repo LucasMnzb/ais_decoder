@@ -1,5 +1,28 @@
 class BinaryConverter {
 
+  double getRateOfTurn(String binaryRateOfTurn) {
+    int rawValue = int.parse(binaryRateOfTurn, radix: 2);
+    if(rawValue >= 128) {
+      rawValue = rawValue - 256;
+    }
+    switch (rawValue) {
+      case 0:
+        return 0.0; // Not turning
+      case 127:
+        return 708.1; // Turning right at more than 5deg/30s (No TI available)
+      case -127:
+        return -708.1; // Turning left at more than 5deg/30s (No TI available)
+      case 128:
+      case -128:
+        return double.nan; // No turn information available (default)
+      default:
+        double rotAIS = rawValue.toDouble();
+        double rotSensor = (rotAIS / 4.733).abs() * (rotAIS / 4.733).abs();
+
+        return rotAIS >= 0 ? rotSensor : -rotSensor;
+    }
+  }
+
   String getVesselCallSign(String binaryCallSign) {
     if(binaryCallSign.length % 6 != 0){
       throw Exception('Input binary Message String for Name must be multiple of 6');

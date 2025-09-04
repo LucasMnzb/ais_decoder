@@ -35,7 +35,7 @@ class PositionMessage extends AISMessage {
 
 
   factory PositionMessage.fromBinary(String binary) {
-    // common shit
+    // common
     int messageType = int.parse(binary.substring(0, 6), radix: 2);
     int repeatIndicator = int.parse(binary.substring(6, 8), radix: 2);
     int mmsi = int.parse(binary.substring(8, 38), radix: 2);
@@ -59,28 +59,7 @@ class PositionMessage extends AISMessage {
     String? maneuverIndicator = BinaryConverter().maneuverIndicatorInfo(maneuverIndicatorBin);
     double speed = int.parse(speedBin, radix: 2) / 10.0;
     double course = int.parse(courseBin, radix: 2) / 10.0;
-    double rateOfTurn()  {
-      int rawValue = int.parse(rateOfTurnBin, radix: 2);
-      if(rawValue >= 128) {
-        rawValue = rawValue - 256;
-      }
-      switch (rawValue) {
-        case 0:
-          return 0.0; // Not turning
-        case 127:
-          return 708.1; // Turning right at more than 5deg/30s (No TI available)
-        case -127:
-          return -708.1; // Turning left at more than 5deg/30s (No TI available)
-        case 128:
-        case -128:
-          return double.nan; // No turn information available (default)
-        default:
-          double rotAIS = rawValue.toDouble();
-          double rotSensor = (rotAIS / 4.733).abs() * (rotAIS / 4.733).abs();
-
-          return rotAIS >= 0 ? rotSensor : -rotSensor;
-      }
-    }
+    double rateOfTurn = BinaryConverter().getRateOfTurn(rateOfTurnBin);
     double heading = int.parse(headingBin, radix: 2).toDouble();
     int timestamp = int.parse(timestampBin, radix: 2);
     int raimEnabled = int.parse(raimEnabledBin, radix: 2);
@@ -96,7 +75,7 @@ class PositionMessage extends AISMessage {
       courseOverGround: course,
       maneuverIndicator: maneuverIndicator ?? '',
       heading: heading,
-      rateOfTurn: rateOfTurn(),
+      rateOfTurn: rateOfTurn,
       timestamp: timestamp,
       raimEnabled: raimEnabled,
     );

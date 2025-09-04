@@ -1,3 +1,4 @@
+import 'src/messages/specialized/basestation_report.dart';
 import 'src/utils/convert_char_to_bin.dart';
 import 'src/utils/debug_prints.dart';
 import 'src/exceptions/ais_exceptions.dart';
@@ -58,20 +59,20 @@ class MessageFactory {
 
       // Static data
         5 => StaticAndVoyageRelatedData.fromBinary(binary),
-        /* 24 => StaticDataReport.fromBinary(binary),
+        // 24 => StaticDataReport.fromBinary(binary),
 
       // Safety src.messages
-        12 => AddressedSafetyRelatedMessage.fromBinary(binary),
-        13 => SafetyRelatedAcknowledgement.fromBinary(binary),
-        14 => SafetyRelatedBroadcastMessage.fromBinary(binary),
+        // 12 => AddressedSafetyRelatedMessage.fromBinary(binary),
+        // 13 => SafetyRelatedAcknowledgement.fromBinary(binary),
+        // 14 => SafetyRelatedBroadcastMessage.fromBinary(binary),
 
       // Specialized
-        4 => BasestationReport.fromBinary(binary),
-        21 => AidToNavigationReport.fromBinary(binary),
+        4 => BaseStationReport.fromBinary(binary),
+        // 21 => AidToNavigationReport.fromBinary(binary),
 
       // Binary src.messages
-        6 => BinaryAddressedMessage.fromBinary(binary),
-        8 => BinaryBroadcastMessage.fromBinary(binary),*/
+        // 6 => BinaryAddressedMessage.fromBinary(binary),
+        // 8 => BinaryBroadcastMessage.fromBinary(binary),*/
 
         _ => throw UnsupportedMessageTypeException(messageType),
       };

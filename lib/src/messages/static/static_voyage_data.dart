@@ -59,7 +59,7 @@ class StaticAndVoyageRelatedData extends AISMessage {
   factory StaticAndVoyageRelatedData.fromBinary(String binaryInput) {
     String binary = binaryInput.padRight(424, '0'); // add padding of zeroes if second part got truncated for some f*ck-all reasons...
 
-    // common shit
+    // common
     int messageType = int.parse(binary.substring(0, 6), radix: 2);
     int repeatIndicator = int.parse(binary.substring(6, 8), radix: 2);
     int mmsi = int.parse(binary.substring(8, 38), radix: 2);

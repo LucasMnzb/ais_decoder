@@ -59,7 +59,7 @@ class ExtendedClassBCSPositionReport extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, SOG: $speedOverGround, Accuracy: $positionAccuracy, Lat: $latitude, Lon: $longitude, COG: $courseOverGround, Heading: $heading, Timestamp: $timestamp, Regional: $regionalReserved, Name: $vesselName, VesselType: $vesselType, DimBow: $dimensionBow, DimStern: $dimensionStern, DimPort: $dimensionPort, DimStbd: $dimensionStarboard, EPFD: $epfdFixType, RAIM: $raimFlag, DTE: $dte, Assigned: $assignedMode, Spare: $spare)';
 
   factory ExtendedClassBCSPositionReport.fromBinary(String binary) {
-    // common shit
+    // common
     int messageType = int.parse(binary.substring(0, 6), radix: 2);
     int repeatIndicator = int.parse(binary.substring(6, 8), radix: 2);
     int mmsi = int.parse(binary.substring(8, 38), radix: 2);

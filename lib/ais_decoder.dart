@@ -14,3 +14,6 @@ export 'src/messages/position/long_range_broadcast.dart';
 
 // static and voyage
 export 'src/messages/static/static_voyage_data.dart';
+
+// specialized
+export 'src/messages/specialized/basestation_report.dart';
