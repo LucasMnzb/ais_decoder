@@ -26,7 +26,7 @@ This library decodes NMEA AIS sentences (AIVDM format) into structured Dart obje
 - [ ] All 27+ standard AIS message types
 - [ ] Binary message support (Types 6, 8, 25, 26)
 - [ ] Aid to Navigation messages (Type 21)
-- [ ] Base Station messages (Type 4)
+- [x] Base Station messages (Type 4)
 - [ ] Comprehensive test coverage
 - [ ] Performance optimizations
 - [ ] Additional utility functions
