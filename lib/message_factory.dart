@@ -24,7 +24,7 @@ class MessageFactory {
     }
 
     if(input.contains("!AIVDM") || input.contains("!AIVDO")) {
-      print("Supplied !AIVDM String - Converting...");
+      // print("Supplied !AIVDM String - Converting...");
 
       List<String> fields = input.split(',');
 
@@ -84,11 +84,11 @@ class MessageFactory {
 
   // Helper method to check if a message type is supported ToDo: Update
   static bool isSupported(int messageType) {
-    return [1, 2, 3, 4, 5, 18, 19, 24].contains(messageType);
+    return [1, 2, 3, 4, 5, 18, 19, 27].contains(messageType);
   }
 
   // Helper method to get supported message types ToDo: Update
   static List<int> getSupportedTypes() {
-    return [1, 2, 3, 4, 5, 18, 19, 24];
+    return [1, 2, 3, 4, 5, 18, 19, 27];
   }
 }
