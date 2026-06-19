@@ -331,7 +331,7 @@ class BinaryConverter {
     String destination = segments.map(ais6BitToAscii).join();
 
     // Trim the padding spaces and return the result
-    return destination.trim();
+    return destination.replaceAll(RegExp(r'@+$'), '');
   }
 
   ///Convert the Binary MessageType to a String to interpret later or show the client.
