@@ -12,11 +12,10 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 # No dependencies needed - pure Dart implementation!
-dependencies:
 
 dev_dependencies:
   # For testing (add when you write tests)
-  test: ^1.24.0
+  test: ^1.31.1
 
   # For linting (optional but recommended)
   lints: ^3.0.0

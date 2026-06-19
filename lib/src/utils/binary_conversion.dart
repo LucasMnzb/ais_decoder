@@ -47,7 +47,7 @@ class BinaryConverter {
         result += '@';
       }
     }
-    return result;
+    return result.replaceAll(RegExp(r'@+$'), '');
   }
 
   ///Function to get the AIS Version of the used System.
@@ -85,7 +85,7 @@ class BinaryConverter {
         result += '@';
       }
     }
-    return result;
+    return result.replaceAll(RegExp(r'@+$'), '');
   }
 
   ///Get the Dimensions to different places on the vessel in Meters (always provide all four dimensions => bow, stern, port, starboard). Array is => bow, stern, port, starboard.
