@@ -6,11 +6,11 @@ class PositionMessage extends AISMessage {
   final String navigationStatus;
   final double? latitude;
   final double? longitude;
-  final double speedOverGround;
-  final double courseOverGround;
+  final double? speedOverGround;
+  final double? courseOverGround;
   final String maneuverIndicator;
   final double rateOfTurn;
-  final double heading;
+  final double? heading;
   final int timestamp;
   final int raimEnabled;
 
@@ -57,10 +57,13 @@ class PositionMessage extends AISMessage {
     double? longitude = CoordinateUtils().calculateLongitude(longitudeBin);
     double? latitude = CoordinateUtils().calculateLatitude(latitudeBin);
     String? maneuverIndicator = BinaryConverter().maneuverIndicatorInfo(maneuverIndicatorBin);
-    double speed = int.parse(speedBin, radix: 2) / 10.0;
-    double course = int.parse(courseBin, radix: 2) / 10.0;
+    int speedDecoded = int.parse(speedBin, radix: 2);
+    double? speed = 0 <= speedDecoded && speedDecoded <= 1022 ? speedDecoded / 10.0 : null;
+    int courseDecoded = int.parse(courseBin, radix: 2);
+    double? course = 0 <= courseDecoded && courseDecoded < 3600 ? courseDecoded / 10.0 : null;
     double rateOfTurn = BinaryConverter().getRateOfTurn(rateOfTurnBin);
-    double heading = int.parse(headingBin, radix: 2).toDouble();
+    int headingDecoded = int.parse(headingBin, radix: 2);
+    double? heading = 0 <= headingDecoded && headingDecoded < 360 ? headingDecoded.toDouble() : null;
     int timestamp = int.parse(timestampBin, radix: 2);
     int raimEnabled = int.parse(raimEnabledBin, radix: 2);
 
