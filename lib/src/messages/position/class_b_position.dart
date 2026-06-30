@@ -1,10 +1,8 @@
-import 'package:ais_decoder/ais_decoder.dart';
+import '../../../ais_decoder.dart';
 import '../../utils/coordinate_utils.dart';
-
 
 // ToDo: Implement missing 9 possibly sent data points!
 class StandardClassBCSPositionReport extends AISMessage {
-
   final double? latitude;
   final double? longitude;
   final double? speedOverGround;
@@ -29,7 +27,8 @@ class StandardClassBCSPositionReport extends AISMessage {
   });
 
   @override
-  String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Heading: $heading, Accuracy: $positionAccuracy, Lat: $latitude, Lon: $longitude, COG: $courseOverGround, RAIM: $raimFlag, SOG: $speedOverGround, Timestamp: $timestamp)';
+  String toString() =>
+      'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Heading: $heading, Accuracy: $positionAccuracy, Lat: $latitude, Lon: $longitude, COG: $courseOverGround, RAIM: $raimFlag, SOG: $speedOverGround, Timestamp: $timestamp)';
 
   factory StandardClassBCSPositionReport.fromBinary(String binary) {
     // common
@@ -49,15 +48,21 @@ class StandardClassBCSPositionReport extends AISMessage {
 
     // conversion to actually readable data
     int headingDecoded = int.parse(headingBin, radix: 2);
-    double? heading = 0 <= headingDecoded && headingDecoded < 360 ? headingDecoded.toDouble() : null;
+    double? heading = 0 <= headingDecoded && headingDecoded < 360
+        ? headingDecoded.toDouble()
+        : null;
     int positionAccuracy = int.parse(positionAccuracyBin, radix: 2);
     int raimFlag = int.parse(raimFlagBin, radix: 2);
     double? longitude = CoordinateUtils().calculateLongitude(longitudeBin);
     double? latitude = CoordinateUtils().calculateLatitude(latitudeBin);
     int speedDecoded = int.parse(speedBin, radix: 2);
-    double? speed = 0 <= speedDecoded && speedDecoded <= 1022 ? speedDecoded / 10.0 : null;
+    double? speed = 0 <= speedDecoded && speedDecoded <= 1022
+        ? speedDecoded / 10.0
+        : null;
     int courseDecoded = int.parse(courseBin, radix: 2);
-    double? course = 0 <= courseDecoded && courseDecoded < 3600 ? courseDecoded / 10.0 : null;
+    double? course = 0 <= courseDecoded && courseDecoded < 3600
+        ? courseDecoded / 10.0
+        : null;
     int timestamp = int.parse(timestampBin, radix: 2);
 
     return StandardClassBCSPositionReport(

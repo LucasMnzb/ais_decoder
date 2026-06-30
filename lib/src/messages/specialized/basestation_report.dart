@@ -1,6 +1,6 @@
-import '/ais_decoder.dart';
-import '/src/utils/binary_conversion.dart';
-import '/src/utils/coordinate_utils.dart';
+import '../../../ais_decoder.dart';
+import '../../utils/binary_conversion.dart';
+import '../../utils/coordinate_utils.dart';
 
 class BaseStationReport extends AISMessage {
   final int year;
@@ -37,8 +37,8 @@ class BaseStationReport extends AISMessage {
   });
 
   @override
-  String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Year: $year, Month: $month, Day: $day, Hour: $hour, Minute: $minute, Second: $second, Accuracy: $accuracy, Lat: $latitude, Lon: $longitude, EPFD: $epfdFixType, RAIM: $raim, SOTDMA: $sotdmaState)';
-
+  String toString() =>
+      'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Year: $year, Month: $month, Day: $day, Hour: $hour, Minute: $minute, Second: $second, Accuracy: $accuracy, Lat: $latitude, Lon: $longitude, EPFD: $epfdFixType, RAIM: $raim, SOTDMA: $sotdmaState)';
 
   factory BaseStationReport.fromBinary(String binary) {
     // common
@@ -92,8 +92,7 @@ class BaseStationReport extends AISMessage {
       epfdFixType: positionFixType,
       spare: spare,
       raim: raimFlag,
-      sotdmaState: sotdmaState
+      sotdmaState: sotdmaState,
     );
-
   }
 }

@@ -1,5 +1,5 @@
-import '/ais_decoder.dart';
-import '/src/utils/binary_conversion.dart';
+import '../../../ais_decoder.dart';
+import '../../utils/binary_conversion.dart';
 
 class StaticAndVoyageRelatedData extends AISMessage {
   final int aisVersion;
@@ -57,7 +57,10 @@ class StaticAndVoyageRelatedData extends AISMessage {
       'Draught: ${draught}m, Destination: $destination, DTE: $dte, Spare: $spare)';
 
   factory StaticAndVoyageRelatedData.fromBinary(String binaryInput) {
-    String binary = binaryInput.padRight(424, '0'); // add padding of zeroes if second part got truncated for some f*ck-all reasons...
+    String binary = binaryInput.padRight(
+      424,
+      '0',
+    ); // add padding of zeroes if second part got truncated for some f*ck-all reasons...
 
     // common
     int messageType = int.parse(binary.substring(0, 6), radix: 2);
@@ -90,7 +93,9 @@ class StaticAndVoyageRelatedData extends AISMessage {
     int dimensionStern = int.parse(dimensionSternBin, radix: 2);
     int dimensionPort = int.parse(dimensionPortBin, radix: 2);
     int dimensionStarboard = int.parse(dimensionStarboardBin, radix: 2);
-    String positionFixType = BinaryConverter().getEPFDFixType(positionFixTypeBin);
+    String positionFixType = BinaryConverter().getEPFDFixType(
+      positionFixTypeBin,
+    );
     int etaMonth = int.parse(etaMonthBin, radix: 2);
     int etaDay = int.parse(etaDayBin, radix: 2);
     int etaHour = int.parse(etaHourBin, radix: 2);
@@ -122,7 +127,7 @@ class StaticAndVoyageRelatedData extends AISMessage {
       draught: draught,
       destination: destination,
       dte: dteReady,
-      spare: spare
+      spare: spare,
     );
   }
 }

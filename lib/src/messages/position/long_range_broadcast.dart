@@ -1,6 +1,6 @@
-import '/ais_decoder.dart';
-import '/src/utils/binary_conversion.dart';
-import '/src/utils/coordinate_utils.dart';
+import '../../../ais_decoder.dart';
+import '../../utils/binary_conversion.dart';
+import '../../utils/coordinate_utils.dart';
 
 class LongRangeAISBroadcastMessage extends AISMessage {
   final int raimEnabled;
@@ -11,7 +11,6 @@ class LongRangeAISBroadcastMessage extends AISMessage {
   final double courseOverGround;
   final int gnssPositionStatus;
   final int spare;
-
 
   LongRangeAISBroadcastMessage({
     required super.messageType,
@@ -28,7 +27,8 @@ class LongRangeAISBroadcastMessage extends AISMessage {
   });
 
   @override
-  String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, RAIM: $raimEnabled, Status: $navigationStatus, Lat: $latitude, Lon: $longitude, SOG: $speedOverGround, COG: $courseOverGround, GNSS: $gnssPositionStatus, Spare: $spare)';
+  String toString() =>
+      'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, RAIM: $raimEnabled, Status: $navigationStatus, Lat: $latitude, Lon: $longitude, SOG: $speedOverGround, COG: $courseOverGround, GNSS: $gnssPositionStatus, Spare: $spare)';
 
   factory LongRangeAISBroadcastMessage.fromBinary(String binary) {
     // common
@@ -48,14 +48,15 @@ class LongRangeAISBroadcastMessage extends AISMessage {
 
     // conversion to actually readable data
     int raimEnabled = int.parse(raimEnabledBin, radix: 2);
-    String? navigationStatus = BinaryConverter().navigationStatusInfo(navigationStatusBin);
+    String? navigationStatus = BinaryConverter().navigationStatusInfo(
+      navigationStatusBin,
+    );
     double? longitude = CoordinateUtils().calculateLongitude(longitudeBin);
     double? latitude = CoordinateUtils().calculateLatitude(latitudeBin);
     double speed = int.parse(speedBin, radix: 2) / 10.0;
     double course = int.parse(courseBin, radix: 2) / 10.0;
     int gnssStatus = int.parse(gnssBin, radix: 2);
     int spare = int.parse(spareBin, radix: 2);
-
 
     return LongRangeAISBroadcastMessage(
       messageType: messageType,
@@ -70,6 +71,5 @@ class LongRangeAISBroadcastMessage extends AISMessage {
       gnssPositionStatus: gnssStatus,
       spare: spare,
     );
-
   }
 }

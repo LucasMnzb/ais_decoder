@@ -1,6 +1,6 @@
-import '/ais_decoder.dart';
-import '/src/utils/binary_conversion.dart';
-import '/src/utils/coordinate_utils.dart';
+import '../../../ais_decoder.dart';
+import '../../utils/binary_conversion.dart';
+import '../../utils/coordinate_utils.dart';
 
 class PositionMessage extends AISMessage {
   final String navigationStatus;
@@ -31,8 +31,8 @@ class PositionMessage extends AISMessage {
   });
 
   @override
-  String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Status: $navigationStatus, Lat: $latitude, Lon: $longitude, SOG: $speedOverGround, COG: $courseOverGround, Maneuver: $maneuverIndicator, ROT: $rateOfTurn, Heading: $heading, Timestamp: $timestamp, RAIM: $raimEnabled)';
-
+  String toString() =>
+      'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Status: $navigationStatus, Lat: $latitude, Lon: $longitude, SOG: $speedOverGround, COG: $courseOverGround, Maneuver: $maneuverIndicator, ROT: $rateOfTurn, Heading: $heading, Timestamp: $timestamp, RAIM: $raimEnabled)';
 
   factory PositionMessage.fromBinary(String binary) {
     // common
@@ -53,17 +53,27 @@ class PositionMessage extends AISMessage {
     String raimEnabledBin = binary.substring(148, 149);
 
     // conversion to actually readable data
-    String? navigationStatus = BinaryConverter().navigationStatusInfo(navigationStatusBin);
+    String? navigationStatus = BinaryConverter().navigationStatusInfo(
+      navigationStatusBin,
+    );
     double? longitude = CoordinateUtils().calculateLongitude(longitudeBin);
     double? latitude = CoordinateUtils().calculateLatitude(latitudeBin);
-    String? maneuverIndicator = BinaryConverter().maneuverIndicatorInfo(maneuverIndicatorBin);
+    String? maneuverIndicator = BinaryConverter().maneuverIndicatorInfo(
+      maneuverIndicatorBin,
+    );
     int speedDecoded = int.parse(speedBin, radix: 2);
-    double? speed = 0 <= speedDecoded && speedDecoded <= 1022 ? speedDecoded / 10.0 : null;
+    double? speed = 0 <= speedDecoded && speedDecoded <= 1022
+        ? speedDecoded / 10.0
+        : null;
     int courseDecoded = int.parse(courseBin, radix: 2);
-    double? course = 0 <= courseDecoded && courseDecoded < 3600 ? courseDecoded / 10.0 : null;
+    double? course = 0 <= courseDecoded && courseDecoded < 3600
+        ? courseDecoded / 10.0
+        : null;
     double rateOfTurn = BinaryConverter().getRateOfTurn(rateOfTurnBin);
     int headingDecoded = int.parse(headingBin, radix: 2);
-    double? heading = 0 <= headingDecoded && headingDecoded < 360 ? headingDecoded.toDouble() : null;
+    double? heading = 0 <= headingDecoded && headingDecoded < 360
+        ? headingDecoded.toDouble()
+        : null;
     int timestamp = int.parse(timestampBin, radix: 2);
     int raimEnabled = int.parse(raimEnabledBin, radix: 2);
 
@@ -82,6 +92,5 @@ class PositionMessage extends AISMessage {
       timestamp: timestamp,
       raimEnabled: raimEnabled,
     );
-
   }
 }

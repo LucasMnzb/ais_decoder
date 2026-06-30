@@ -1,13 +1,11 @@
-import '/ais_decoder.dart';
-import '/src/utils/binary_conversion.dart';
+import '../../../ais_decoder.dart';
+import '../../utils/binary_conversion.dart';
 import '../../utils/coordinate_utils.dart';
-
 
 /// ## Extended Class B CS Position Report
 ///
 /// Note: The information in the ship name and dimension fields is not reliable, as it has to be hand-entered by humans rather than gathered automatically from sensors.
 class ExtendedClassBCSPositionReport extends AISMessage {
-
   final double speedOverGround;
   final int positionAccuracy;
   final double? longitude;
@@ -56,7 +54,8 @@ class ExtendedClassBCSPositionReport extends AISMessage {
   });
 
   @override
-  String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, SOG: $speedOverGround, Accuracy: $positionAccuracy, Lat: $latitude, Lon: $longitude, COG: $courseOverGround, Heading: $heading, Timestamp: $timestamp, Regional: $regionalReserved, Name: $vesselName, VesselType: $vesselType, DimBow: $dimensionBow, DimStern: $dimensionStern, DimPort: $dimensionPort, DimStbd: $dimensionStarboard, EPFD: $epfdFixType, RAIM: $raimFlag, DTE: $dte, Assigned: $assignedMode, Spare: $spare)';
+  String toString() =>
+      'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, SOG: $speedOverGround, Accuracy: $positionAccuracy, Lat: $latitude, Lon: $longitude, COG: $courseOverGround, Heading: $heading, Timestamp: $timestamp, Regional: $regionalReserved, Name: $vesselName, VesselType: $vesselType, DimBow: $dimensionBow, DimStern: $dimensionStern, DimPort: $dimensionPort, DimStbd: $dimensionStarboard, EPFD: $epfdFixType, RAIM: $raimFlag, DTE: $dte, Assigned: $assignedMode, Spare: $spare)';
 
   factory ExtendedClassBCSPositionReport.fromBinary(String binary) {
     // common
@@ -93,7 +92,10 @@ class ExtendedClassBCSPositionReport extends AISMessage {
     double course = int.parse(courseBin, radix: 2) / 10.0;
     double heading = int.parse(headingBin, radix: 2).toDouble();
     int timestamp = int.parse(timestampBin, radix: 2);
-    double regionalReserved = int.parse(regionalReservedBin, radix: 2).toDouble(); // Uninterpreted
+    double regionalReserved = int.parse(
+      regionalReservedBin,
+      radix: 2,
+    ).toDouble(); // Uninterpreted
     String vesselName = BinaryConverter().getVesselName(nameBin);
     int vesselTypeInt = int.parse(typeOfShipAndCargoBin);
     String vesselType = BinaryConverter().getVesselType(typeOfShipAndCargoBin);
@@ -101,10 +103,18 @@ class ExtendedClassBCSPositionReport extends AISMessage {
     int dimensionStern = int.parse(dimensionSternBin, radix: 2);
     int dimensionPort = int.parse(dimensionPortBin, radix: 2);
     int dimensionStarboard = int.parse(dimensionStarboardBin, radix: 2);
-    String positionFixType = BinaryConverter().getEPFDFixType(positionFixTypeBin);
+    String positionFixType = BinaryConverter().getEPFDFixType(
+      positionFixTypeBin,
+    );
     int raimFlag = int.parse(raimFlagBin, radix: 2);
-    int dteReady = int.parse(dteReadyBin, radix: 2); // 0 = ready, 1 = not ready (default)
-    int assignedMode = int.parse(assignedModeBin, radix: 2); // See IALA for details.
+    int dteReady = int.parse(
+      dteReadyBin,
+      radix: 2,
+    ); // 0 = ready, 1 = not ready (default)
+    int assignedMode = int.parse(
+      assignedModeBin,
+      radix: 2,
+    ); // See IALA for details.
     int spare = int.parse(spareBin, radix: 2); // unused and should be 0.
 
     return ExtendedClassBCSPositionReport(
