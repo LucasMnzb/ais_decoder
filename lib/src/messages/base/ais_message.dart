@@ -16,6 +16,8 @@ abstract class AISMessage {
   /// Supply either an already binary encoded AIS String or even simpler just supply the ```!AIVDM```-String directly
   ///
   /// The enable debugging param is just for more extensive Logging output when developing, defaults to false!
-  factory AISMessage.fromString(String input, {bool enableDebugging = false}) =>
-      MessageFactory.create(input, enableDebugging);
+  ///
+  /// Legacy mode uses the old conversion method to decode strings using concatenations, might yield slower results.
+  factory AISMessage.fromString(String input, {bool enableDebugging = false, legacy = false}) =>
+      MessageFactory.create(input, enableDebugging, legacy);
 }

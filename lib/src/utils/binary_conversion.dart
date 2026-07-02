@@ -1,7 +1,16 @@
+import 'getInt.dart';
+
 class BinaryConverter {
 
+  //region ROT
+  /// Get the ROT of the Vessel
+  @Deprecated("Superseded by getRateOfTurnDirect")
   double getRateOfTurn(String binaryRateOfTurn) {
-    int rawValue = int.parse(binaryRateOfTurn, radix: 2);
+    return getRateOfTurnDirect(int.parse(binaryRateOfTurn, radix: 2));
+  }
+
+  ///Get the ROT of the Vessel
+  double getRateOfTurnDirect(int rawValue) {
     if(rawValue >= 128) {
       rawValue = rawValue - 256;
     }
@@ -22,7 +31,42 @@ class BinaryConverter {
         return rotAIS >= 0 ? rotSensor : -rotSensor;
     }
   }
+  //endregion
 
+  //region TextBased (NEW)
+  /// This method is used for all AIS Fields that require Text output (name, callsign, destination, vendorID)
+  String getTextFromSixBitCharacters(String encoded, int startBit, int endBit) {
+    const aisChars = '@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ !"#\$%&\'()*+,-./0123456789:;<=>?';
+    int lengthInBits = endBit - startBit;
+
+    final buffer = StringBuffer();
+    for (int i = 0; i < lengthInBits; i += 6) {
+      final decimalValue = getUintDirect(encoded, startBit + i, startBit + i + 6);
+      buffer.write(decimalValue < aisChars.length ? aisChars[decimalValue] : '@');
+    }
+
+    return buffer.toString().replaceAll(RegExp(r'@+$'), '');
+  }
+
+  String getVesselNameDirect(String encoded, int startBit, int endBit) {
+    return getTextFromSixBitCharacters(encoded, startBit, endBit);
+  }
+
+  String getVesselCallSignDirect(String encoded, int startBit, int endBit) {
+    return getTextFromSixBitCharacters(encoded, startBit, endBit);
+  }
+
+  String getDestinationDirect(String encoded, int startBit, int endBit) {
+    return getTextFromSixBitCharacters(encoded, startBit, endBit);
+  }
+
+  String getVendorIdDirect(String encoded, int startBit, int endBit) {
+    return getTextFromSixBitCharacters(encoded, startBit, endBit);
+  }
+  //endregion
+
+  //region TextBased
+  @Deprecated("Use getTextFromSixBitCharacters instead")
   String getVesselCallSign(String binaryCallSign) {
     if(binaryCallSign.length % 6 != 0){
       throw Exception('Input binary Message String for Name must be multiple of 6');
@@ -50,18 +94,8 @@ class BinaryConverter {
     return result.replaceAll(RegExp(r'@+$'), '');
   }
 
-  ///Function to get the AIS Version of the used System.
-  String getAISVersion(String binaryAISVersion) {
-    final version = int.parse(binaryAISVersion, radix: 2);
-    if(version == 0) {
-      return "ITU1371";
-    } else {
-      return "Unknown AIS Version";
-    }
-
-  }
-
   ///Get the Name of the Vessel.
+  @Deprecated("Use getTextFromSixBitCharacters instead")
   String getVesselName(String binaryVesselName) {
     if(binaryVesselName.length % 6 != 0){
       throw Exception('Input binary Message String for Name must be multiple of 6');
@@ -88,7 +122,35 @@ class BinaryConverter {
     return result.replaceAll(RegExp(r'@+$'), '');
   }
 
+  ///Function to get the Destination of the Vessel.
+  @Deprecated("Use getTextFromSixBitCharacters instead")
+  String getDestination(String binaryString) {
+    // Function to convert a 6-bit binary string to its corresponding ASCII character
+    String ais6BitToAscii(String bits) {
+      int code = int.parse(bits, radix: 2);
+      if (code >= 0 && code <= 31) {
+        return String.fromCharCode(code + 64);  // @ for 0, A-Z for 1-26, etc.
+      } else if (code >= 32 && code <= 63) {
+        return String.fromCharCode(code);  // space for 32, specific characters up to '?'
+      }
+      return '?';  // Fallback for out-of-range codes
+    }
+
+    // Split the binary string into 6-bit segments
+    List<String> segments = [];
+    for (int i = 0; i < binaryString.length; i += 6) {
+      segments.add(binaryString.substring(i, i + 6));
+    }
+
+    // Decode each segment and concatenate into the final string
+    String destination = segments.map(ais6BitToAscii).join();
+
+    // Trim the padding spaces and return the result
+    return destination.replaceAll(RegExp(r'@+$'), '');
+  }
+
   ///Get the vendorId of the Vessel -> 3 six-bit characters.
+  @Deprecated("Use getTextFromSixBitCharacters instead")
   String getVendorId(String binaryVendorId) {
     if(binaryVendorId.length % 6 != 0){
       throw Exception('Input binary Message String for Name must be multiple of 6');
@@ -114,6 +176,24 @@ class BinaryConverter {
     }
     return result.replaceAll(RegExp(r'@+$'), '');
   }
+  //endregion
+
+  //region AISVersion
+  ///Function to get the AIS Version of the used System.
+  @Deprecated("Use getAISVersionDirect instead")
+  String getAISVersion(String binaryAISVersion) {
+    return getAISVersionDirect(int.parse(binaryAISVersion, radix: 2));
+  }
+
+  ///Function to get the AIS Version of the used System.
+  String getAISVersionDirect(int AISVersion) {
+    if(AISVersion == 0) {
+      return "ITU1371";
+    } else {
+      return "Unknown AIS Version";
+    }
+  }
+  //endregion
 
   ///Get the Dimensions to different places on the vessel in Meters (always provide all four dimensions => bow, stern, port, starboard). Array is => bow, stern, port, starboard.
   List<int> getDimensions(String toBow, String toStern, String toPort, String toStarboard) {
@@ -124,11 +204,17 @@ class BinaryConverter {
     return [metersToBow, metersToStern, metersToPort, metersToStarboard];
   }
 
+  //region Vessel Type
   ///Get the Vessel Type.
+  @Deprecated("Superseded by getVesselTypeDirect")
   String getVesselType(String binaryVesselType) {
-    int vesselTypeInt = int.parse(binaryVesselType, radix: 2);
+    return getVesselTypeDirect(int.parse(binaryVesselType, radix: 2));
+  }
+
+  ///Get the Vessel Type.
+  String getVesselTypeDirect(int vesselType) {
     // Long Ass Switch Stmt xD
-    switch (vesselTypeInt) {
+    switch (vesselType) {
       case 0:
         return 'Not available (default)';
       case 1:
@@ -294,11 +380,17 @@ class BinaryConverter {
         return 'Unknown Type';
     }
   }
+  //endregion
+
+  //region EPDF Fix Type
+  ///Get the EPDF Fix Type.
+  @Deprecated("Superseded by getEPFDFixTypeDirect")
+  String getEPFDFixType(String binaryEPFDFixType) {
+   return getEPFDFixTypeDirect(int.parse(binaryEPFDFixType, radix: 2));
+  }
 
   ///Get the EPDF Fix Type.
-  String getEPFDFixType(String binaryEPFDFixType) {
-    int ePFDFixType = int.parse(binaryEPFDFixType, radix: 2);
-
+  String getEPFDFixTypeDirect(int ePFDFixType) {
     switch(ePFDFixType) {
       case(0): return "Undefined (default)";
       case(1): return "GPS";
@@ -319,88 +411,116 @@ class BinaryConverter {
       default: return "Unknown (not sent)";
     }
   }
+  //endregion
+
+  //region Draught
+  ///Calculates the Draught of the Vessel.
+  @Deprecated("Superseded by calculateDraughtDirect")
+  double calculateDraught(String binaryDraught) {
+    return calculateDraughtDirect(int.parse(binaryDraught, radix: 2));
+  }
 
   ///Calculates the Draught of the Vessel.
-  double calculateDraught(String binaryDraught) {
-    int draughtInt = int.parse(binaryDraught, radix: 2);
-    return draughtInt.floorToDouble() / 10;
+  double calculateDraughtDirect(int draught) {
+    return draught.floorToDouble() / 10;
+  }
+  //endregion
+
+  //region DTE
+  ///Checks if DTE is ready.
+  @Deprecated("Superseded by getDTEFunctionDirect")
+  String getDTEFunction(String binaryDTE) {
+    return getDTEFunctionDirect(int.parse(binaryDTE));
   }
 
   ///Checks if DTE is ready.
-  String getDTEFunction(String binaryDTE) {
-    if(binaryDTE == "1") {
+  String getDTEFunctionDirect(int DTE) {
+    if(DTE == 1) {
       return "Data Terminal not Ready (Default)";
     } else {
       return "Data Terminal Ready";
     }
   }
+  //endregion
 
-  ///Function to get the Destination of the Vessel (ChatGPT helped me here).
-  String getDestination(String binaryString) {
-    // Function to convert a 6-bit binary string to its corresponding ASCII character
-    String ais6BitToAscii(String bits) {
-      int code = int.parse(bits, radix: 2);
-      if (code >= 0 && code <= 31) {
-        return String.fromCharCode(code + 64);  // @ for 0, A-Z for 1-26, etc.
-      } else if (code >= 32 && code <= 63) {
-        return String.fromCharCode(code);  // space for 32, specific characters up to '?'
-      }
-      return '?';  // Fallback for out-of-range codes
-    }
-
-    // Split the binary string into 6-bit segments
-    List<String> segments = [];
-    for (int i = 0; i < binaryString.length; i += 6) {
-      segments.add(binaryString.substring(i, i + 6));
-    }
-
-    // Decode each segment and concatenate into the final string
-    String destination = segments.map(ais6BitToAscii).join();
-
-    // Trim the padding spaces and return the result
-    return destination.replaceAll(RegExp(r'@+$'), '');
+  //region Message Type Info
+  ///Convert the Binary MessageType to a String to interpret later or show the client.
+  String? messageTypeInfo(String binaryMessageType) {
+    return messageTypeInfoDirect(int.parse(binaryMessageType, radix: 2));
   }
 
   ///Convert the Binary MessageType to a String to interpret later or show the client.
-  String? messageTypeInfo(String binaryMessageType) {
-    int messageType = int.parse(binaryMessageType, radix: 2);
-
+  String? messageTypeInfoDirect(int messageType) {
     switch(messageType) {
-      case(1): return "Position Report Class A";
-      case(2): return "Position Report Class A (Assigned Schedule)";
-      case(3): return "Position Report Class A (Response to interrogation)";
-      case(4): return "Base Station Report";
-      case(5): return "Static and Voyage Related Data";
-      case(6): return "Binary Addressed Message";
-      case(7): return "Binary Acknowledgement";
-      case(8): return "Binary Broadcast Message";
-      case(9): return "Standard SAR Aircraft Position Report";
-      case(10): return "UTC and Date Inquiry";
-      case(11): return "UTC and Date Response";
-      case(12): return "Addressed Safety Related Message";
-      case(13): return "Safety Related Acknowledgement";
-      case(14): return "Safety Related Broadcast Message";
-      case(15): return "Interrogation";
-      case(16): return "Assignment Mode Command";
-      case(17): return "DGNSS Binary Broadcast Message";
-      case(18): return "Standard Class B CS Position Report";
-      case(19): return "Extended Class B Equipment Position Report";
-      case(20): return "Data Link Management";
-      case(21): return "Aid-to-Navigation Report";
-      case(22): return "Channel Management";
-      case(23): return "Group Assignment Command";
-      case(24): return "Static Data Report";
-      case(25): return "Single Slot Binary Message";
-      case(26): return "Multiple Slot Binary Message With Communications State";
-      case(27): return "Position Report For Long-Range Applications";
-      default: return "Unknown";
+      case(1):
+        return "Position Report Class A";
+      case(2):
+        return "Position Report Class A (Assigned Schedule)";
+      case(3):
+        return "Position Report Class A (Response to interrogation)";
+      case(4):
+        return "Base Station Report";
+      case(5):
+        return "Static and Voyage Related Data";
+      case(6):
+        return "Binary Addressed Message";
+      case(7):
+        return "Binary Acknowledgement";
+      case(8):
+        return "Binary Broadcast Message";
+      case(9):
+        return "Standard SAR Aircraft Position Report";
+      case(10):
+        return "UTC and Date Inquiry";
+      case(11):
+        return "UTC and Date Response";
+      case(12):
+        return "Addressed Safety Related Message";
+      case(13):
+        return "Safety Related Acknowledgement";
+      case(14):
+        return "Safety Related Broadcast Message";
+      case(15):
+        return "Interrogation";
+      case(16):
+        return "Assignment Mode Command";
+      case(17):
+        return "DGNSS Binary Broadcast Message";
+      case(18):
+        return "Standard Class B CS Position Report";
+      case(19):
+        return "Extended Class B Equipment Position Report";
+      case(20):
+        return "Data Link Management";
+      case(21):
+        return "Aid-to-Navigation Report";
+      case(22):
+        return "Channel Management";
+      case(23):
+        return "Group Assignment Command";
+      case(24):
+        return "Static Data Report";
+      case(25):
+        return "Single Slot Binary Message";
+      case(26):
+        return "Multiple Slot Binary Message With Communications State";
+      case(27):
+        return "Position Report For Long-Range Applications";
+      default:
+        return "Unknown";
     }
+  }
+  //endregion
+
+  //region Nav Status Info
+  ///Convert the Binary Navigation Status to a String to interpret later or show the client.
+  @Deprecated("Superseded by navigationStatusInfoDirect")
+  String? navigationStatusInfo(String binaryNavigationStatus) {
+    return navigationStatusInfoDirect(int.parse(binaryNavigationStatus, radix: 2));
   }
 
   ///Convert the Binary Navigation Status to a String to interpret later or show the client.
-  String? navigationStatusInfo(String binaryNavigationStatus) {
-    int navigationStatus = int.parse(binaryNavigationStatus, radix: 2);
-
+  String? navigationStatusInfoDirect(int navigationStatus) {
     switch(navigationStatus) {
       case(0): return "Under way using engine";
       case(1): return "At anchor";
@@ -421,11 +541,17 @@ class BinaryConverter {
       default: return "Unknown";
     }
   }
+  //endregion
+
+  //region Turn Info
+  ///Convert the Binary Turn Information to a String to interpret later or show the client.
+  @Deprecated("Superseded by turnInformationInfoDirect")
+  String? turnInformationInfo(String binaryTurnInformation) {
+    return turnInformationInfoDirect(int.parse(binaryTurnInformation, radix: 2));
+  }
 
   ///Convert the Binary Turn Information to a String to interpret later or show the client.
-  String? turnInformationInfo(String binaryTurnInformation) {
-    int turnInformation = int.parse(binaryTurnInformation, radix: 2);
-
+  String? turnInformationInfoDirect(int turnInformation) {
     if(turnInformation == 0) {
       return "Not turning";
     }
@@ -448,24 +574,35 @@ class BinaryConverter {
       return "Unknown";
     }
   }
+  //endregion
 
+  //region SOG Info
   ///Convert the Binary Speed Information to a String which shows the speed of the vessel in knots.
+  @Deprecated("Superseded by speedOverGroundInfoDirect")
   String? speedOverGroundInfo(String binarySpeedOverGround) {
-    double speedInfo = int.parse(binarySpeedOverGround, radix: 2) / 10;
+    return speedOverGroundInfoDirect(int.parse(binarySpeedOverGround, radix: 2).floorToDouble() / 10);
+  }
 
-    if(speedInfo == 102.3) {
+  ///Convert the Binary Speed Information to a String which shows the speed of the vessel in knots. Important its the binary int but divided by 10 to get a double!
+  String? speedOverGroundInfoDirect(double speedOverGround) {
+    if(speedOverGround == 102.3) {
       return "Speed not Available (not sent)";
-    } else if(speedInfo == 102.2) {
+    } else if(speedOverGround == 102.2) {
       return "Speed over 102.2 knots";
     } else {
-      return speedInfo.toString();
+      return speedOverGround.toString();
     }
+  }
+  //endregion
+
+  //region Position Accuracy Info
+  ///Convert the Binary Position Accuracy to a String which tells more about the position accuracy.
+  String? positionAccuracyInfo(String binaryPositionAccuracy) {
+    return positionAccuracyInfoDirect(int.parse(binaryPositionAccuracy, radix: 2));
   }
 
   ///Convert the Binary Position Accuracy to a String which tells more about the position accuracy.
-  String? positionAccuracyInfo(String binaryPositionAccuracy) {
-    int positionAccuracy = int.parse(binaryPositionAccuracy);
-
+  String? positionAccuracyInfoDirect(int positionAccuracy) {
     if(positionAccuracy == 0) {
       return "Accuracy < 10ms";
     }
@@ -475,33 +612,50 @@ class BinaryConverter {
       return "Error please Contact: ";
     }
   }
+  //endregion
 
+  //region COG Info
   ///Convert the Binary Course Over Ground to a String which represents the Course Over Ground to interpret later or show the client.
   String? courseOverGroundInfo(String binaryCourseOverGround) {
-    double courseOverGround = int.parse(binaryCourseOverGround, radix: 2) / 10;
+    return courseOverGroundInfoDirect(int.parse(binaryCourseOverGround, radix: 2).floorToDouble() / 10);
+  }
 
+  ///Convert the Binary Course Over Ground to a String which represents the Course Over Ground to interpret later or show the client. Important binary String always divided by 10 to get Double!
+  String? courseOverGroundInfoDirect(double courseOverGround) {
     if(courseOverGround == 360.0) {
       return "Data not available (not sent)";
     } else {
       return courseOverGround.toString();
     }
   }
+  //endregion
+
+  //region True Heading Info
+  ///Convert the Binary True Heading to a String which represents the True Heading of the vessel to interpret later or show the client.
+  @Deprecated("Superseded by trueHeadingInfoDirect")
+  String? trueHeadingInfo(String binaryTrueHeading) {
+    return trueHeadingInfoDirect(int.parse(binaryTrueHeading, radix: 2));
+  }
 
   ///Convert the Binary True Heading to a String which represents the True Heading of the vessel to interpret later or show the client.
-  String? trueHeadingInfo(String binaryTrueHeading) {
-    int trueHeading = int.parse(binaryTrueHeading, radix: 2);
-
-    if(trueHeading == 511) {
+  String? trueHeadingInfoDirect(int trueHeading) {
+    if(trueHeading == 360) {
       return "Not available (not sent)";
     } else {
       return trueHeading.toString();
     }
   }
+  //endregion
+
+  //region TimeStamp Info
+  ///Convert the Binary Time Stamp to a String which represents the Time Stamp to interpret later or show the user, or gives out the reason why it isn't available/special.
+  @Deprecated("Superseded by timeStampInfoDirect")
+  String? timeStampInfo(String binaryTimeStamp) {
+    return timeStampInfoDirect(int.parse(binaryTimeStamp, radix: 2));
+  }
 
   ///Convert the Binary Time Stamp to a String which represents the Time Stamp to interpret later or show the user, or gives out the reason why it isn't available/special.
-  String? timeStampInfo(String binaryTimeStamp) {
-    int timeStamp = int.parse(binaryTimeStamp, radix: 2);
-
+  String? timeStampInfoDirect(int timeStamp) {
     if(timeStamp == 60) {
       return "Not available (not sent)";
     }
@@ -517,8 +671,11 @@ class BinaryConverter {
       return timeStamp.toString();
     }
   }
-
+  //endregion
+  
+  //region Maneuver Indicator Info
   ///Convert the Maneuver Indicator to a String which identifies the current maneuver of the vessel to interpret later or show the client.
+  @Deprecated("Superseded by maneuverIndicatorInfoDirect")
   String? maneuverIndicatorInfo(String binaryManeuverIndicator) {
     int maneuverIndicator = int.parse(binaryManeuverIndicator, radix: 2);
 
@@ -529,11 +686,27 @@ class BinaryConverter {
       default: return "Unknown";
     }
   }
+  
+  ///Convert the Maneuver Indicator to a String which identifies the current maneuver of the vessel to interpret later or show the client.
+  String? maneuverIndicatorInfoDirect(int maneuverIndicator) {
+    switch(maneuverIndicator) {
+      case(0): return "Not available (Default)";
+      case(1): return "No Special Maneuver";
+      case(2): return "Special Maneuver in Progress";
+      default: return "Unknown";
+    }
+  }
+  //endregion
 
+  //region RAIM Info
   ///Check if RAIM (Receiver Autonomous Integrity Monitoring) is enabled.
+  @Deprecated("Superseded by RAIMInfoDirect")
   String? RAIMInfo(String binaryRAIMFlag) {
-    int RAIMFlag = int.parse(binaryRAIMFlag);
-
+   return RAIMInfoDirect(int.parse(binaryRAIMFlag, radix: 2));
+  }
+  
+  ///Check if RAIM (Receiver Autonomous Integrity Monitoring) is enabled.
+  String? RAIMInfoDirect(int RAIMFlag) {
     if(RAIMFlag == 0) {
       return "RAIM not enabled (default)";
     }
@@ -543,5 +716,6 @@ class BinaryConverter {
       return "Unknown (Please Contact: )";
     }
   }
+  //endregion
 
 }

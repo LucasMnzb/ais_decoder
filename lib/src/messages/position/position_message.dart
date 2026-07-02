@@ -1,6 +1,7 @@
 import '../../../ais_decoder.dart';
 import '../../utils/binary_conversion.dart';
 import '../../utils/coordinate_utils.dart';
+import '../../utils/getInt.dart';
 
 class PositionMessage extends AISMessage {
   final String navigationStatus;
@@ -30,10 +31,38 @@ class PositionMessage extends AISMessage {
     required this.raimEnabled,
   });
 
+  //region Overrides
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;   // cheap shortcut: same object, definitely equal
+    return other is PositionMessage &&
+        messageType == other.messageType &&
+        mmsi == other.mmsi &&
+        repeatIndicator == other.repeatIndicator &&
+        navigationStatus == other.navigationStatus &&
+        latitude == other.latitude &&
+        longitude == other.longitude &&
+        speedOverGround == other.speedOverGround &&
+        courseOverGround == other.courseOverGround &&
+        maneuverIndicator == other.maneuverIndicator &&
+        rateOfTurn == other.rateOfTurn &&
+        heading == other.heading &&
+        timestamp == other.timestamp &&
+        raimEnabled == other.raimEnabled;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    messageType, mmsi, repeatIndicator, navigationStatus,
+    latitude, longitude, speedOverGround, courseOverGround,
+    maneuverIndicator, rateOfTurn, heading, timestamp, raimEnabled,
+  );
+
   @override
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Status: $navigationStatus, Lat: $latitude, Lon: $longitude, SOG: $speedOverGround, COG: $courseOverGround, Maneuver: $maneuverIndicator, ROT: $rateOfTurn, Heading: $heading, Timestamp: $timestamp, RAIM: $raimEnabled)';
+  //endregion
 
-
+  @Deprecated("Legacy Code use .fromEncoded instead for performance reasons")
   factory PositionMessage.fromBinary(String binary) {
     // common
     int messageType = int.parse(binary.substring(0, 6), radix: 2);
@@ -82,6 +111,37 @@ class PositionMessage extends AISMessage {
       timestamp: timestamp,
       raimEnabled: raimEnabled,
     );
+  }
 
+  factory PositionMessage.fromEncoded(String encoded) {
+    int messageType = getUintDirect(encoded, 0, 6);
+    int repeatIndicator = getUintDirect(encoded, 6, 8);
+    int mmsi = getUintDirect(encoded, 8, 38);
+    int navigationStatusRaw = getUintDirect(encoded, 38, 42);
+    int rateOfTurnRaw = getUintDirect(encoded, 42, 50);
+    int speedRaw = getUintDirect(encoded, 50, 60);
+    int longitudeRaw = getSignedIntDirect(encoded, 61, 89);
+    int latitudeRaw = getSignedIntDirect(encoded, 89, 116);
+    int courseRaw = getUintDirect(encoded, 116, 128);
+    int headingRaw = getUintDirect(encoded, 128, 137);
+    int timestampRaw = getUintDirect(encoded, 137, 143);
+    int maneuverIndicatorRaw = getUintDirect(encoded, 143, 145);
+    int raimEnabledRaw = getUintDirect(encoded, 148, 149);
+    
+    return PositionMessage(
+      messageType: messageType,
+      mmsi: mmsi,
+      repeatIndicator: repeatIndicator,
+      navigationStatus: BinaryConverter().navigationStatusInfoDirect(navigationStatusRaw) ?? '',
+      latitude: CoordinateUtils().calculateLatitudeDirect(latitudeRaw, 27),
+      longitude: CoordinateUtils().calculateLongitudeDirect(longitudeRaw, 28),
+      speedOverGround: speedRaw / 10.0,
+      courseOverGround: courseRaw / 10.0,
+      maneuverIndicator: BinaryConverter().maneuverIndicatorInfoDirect(maneuverIndicatorRaw) ?? '',
+      heading: headingRaw.toDouble(),
+      rateOfTurn: BinaryConverter().getRateOfTurnDirect(rateOfTurnRaw),
+      timestamp: timestampRaw,
+      raimEnabled: raimEnabledRaw,
+    );
   }
 }
