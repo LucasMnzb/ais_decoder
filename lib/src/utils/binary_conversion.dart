@@ -88,6 +88,33 @@ class BinaryConverter {
     return result.replaceAll(RegExp(r'@+$'), '');
   }
 
+  ///Get the vendorId of the Vessel -> 3 six-bit characters.
+  String getVendorId(String binaryVendorId) {
+    if(binaryVendorId.length % 6 != 0){
+      throw Exception('Input binary Message String for Name must be multiple of 6');
+    }
+
+    // AIS 6-bit ASCII character set (64 characters total)
+    const aisChars = '@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ !"#\$%&\'()*+,-./0123456789:;<=>?';
+
+    List<String> segments = [];
+    for(int i = 0; i < binaryVendorId.length; i+= 6) {
+      segments.add(binaryVendorId.substring(i, i+6));
+    }
+
+    String result = "";
+
+    for(String segment in segments) {
+      int decimalValue = int.parse(segment, radix: 2);
+      if(decimalValue >= 0 && decimalValue < aisChars.length ) {
+        result += aisChars[decimalValue];
+      } else {
+        result += '@';
+      }
+    }
+    return result.replaceAll(RegExp(r'@+$'), '');
+  }
+
   ///Get the Dimensions to different places on the vessel in Meters (always provide all four dimensions => bow, stern, port, starboard). Array is => bow, stern, port, starboard.
   List<int> getDimensions(String toBow, String toStern, String toPort, String toStarboard) {
     int metersToBow = int.parse(toBow, radix: 2);

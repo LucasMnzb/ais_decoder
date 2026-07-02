@@ -19,6 +19,7 @@ This library decodes NMEA AIS sentences (AIVDM format) into structured Dart obje
 - **Type 1, 2, 3**: Position Reports (Class A vessels)
 - **Type 5**: Static and Voyage Related Data
 - **Type 18, 19**: Standard Class B Position Reports
+- **Type 24**: Static Data Reports (multipart)
 - **Type 27**: Long Range AIS Broadcast Messages
 
 ## Roadmap
@@ -76,6 +77,12 @@ For Multipart message decoding (Type 5) please just combine the two payloads man
 !AIVDM,2,1,0,B,55M67F@000004?78000P59HET0000000000000001P<<<70P0N4m1E52CP00,0*20
 
 A utility class for this will be provided in a future release.
+
+**Important** For Type 24 Messages see below:
+
+Type 24 Messages appear as Part A and Part B in the wild. The decoder will take any Part as normal Input and return a StaticDataReportA or StaticDataReportB Object respectively.
+
+For Applications this means storing both Objects separately and then combining their data when needed - matching should be done via MMSI (existent in both Parts).
 
 ### Debug Mode
 
