@@ -1,13 +1,7 @@
-import 'src/messages/specialized/basestation_report.dart';
+import 'package:ais_decoder/ais_decoder.dart';
 import 'src/utils/convert_char_to_bin.dart';
 import 'src/utils/debug_prints.dart';
-import 'src/exceptions/ais_exceptions.dart';
-import 'src/messages/base/ais_message.dart';
-import 'src/messages/position/class_b_position.dart';
-import 'src/messages/position/extended_class_b.dart';
-import 'src/messages/position/long_range_broadcast.dart';
-import 'src/messages/position/position_message.dart';
-import 'src/messages/static/static_voyage_data.dart';
+
 
 
 // ToDo: (For Release) Needs Extensive Documentation
@@ -47,6 +41,8 @@ class MessageFactory {
     try {
       // get message type
       int messageType = int.parse(binary.substring(0,6), radix: 2);
+      int messagePart = 0;
+      if(messageType == 24) { messagePart = int.parse(binary.substring(38, 40), radix: 2); }
 
       // switch to correct message type handling scenario
       return switch (messageType) {
@@ -59,7 +55,9 @@ class MessageFactory {
 
       // Static data
         5 => StaticAndVoyageRelatedData.fromBinary(binary),
-        // 24 => StaticDataReport.fromBinary(binary),
+        24 => messagePart == 0
+            ? StaticDataReportA.fromBinary(binary)
+            : StaticDataReportB.fromBinary(binary),
 
       // Safety src.messages
         // 12 => AddressedSafetyRelatedMessage.fromBinary(binary),
@@ -84,11 +82,11 @@ class MessageFactory {
 
   // Helper method to check if a message type is supported ToDo: Update
   static bool isSupported(int messageType) {
-    return [1, 2, 3, 4, 5, 18, 19, 27].contains(messageType);
+    return [1, 2, 3, 4, 5, 18, 19, 24, 27].contains(messageType);
   }
 
   // Helper method to get supported message types ToDo: Update
   static List<int> getSupportedTypes() {
-    return [1, 2, 3, 4, 5, 18, 19, 27];
+    return [1, 2, 3, 4, 5, 18, 19, 24, 27];
   }
 }

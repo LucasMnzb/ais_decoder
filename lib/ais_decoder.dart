@@ -2,7 +2,7 @@ library ais_decoder;
 
 // base exports
 export 'src/messages/base/ais_message.dart';
-export '/message_factory.dart';
+export 'message_factory.dart';
 export 'src/exceptions/ais_exceptions.dart';
 
 // src.messages
@@ -14,6 +14,7 @@ export 'src/messages/position/long_range_broadcast.dart';
 
 // static and voyage
 export 'src/messages/static/static_voyage_data.dart';
+export 'src/messages/static/static_data_report.dart';
 
 // specialized
 export 'src/messages/specialized/basestation_report.dart';
