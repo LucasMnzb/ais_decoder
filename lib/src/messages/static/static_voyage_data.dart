@@ -1,5 +1,5 @@
-import '/ais_decoder.dart';
-import '/src/utils/binary_conversion.dart';
+import '../../../ais_decoder.dart';
+import '../../utils/binary_conversion.dart';
 
 class StaticAndVoyageRelatedData extends AISMessage {
   final int aisVersion;

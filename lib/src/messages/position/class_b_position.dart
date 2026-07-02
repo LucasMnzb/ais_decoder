@@ -1,4 +1,4 @@
-import 'package:ais_decoder/ais_decoder.dart';
+import '../../../ais_decoder.dart';
 import '../../utils/coordinate_utils.dart';
 
 

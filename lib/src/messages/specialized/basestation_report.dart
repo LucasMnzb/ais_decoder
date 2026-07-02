@@ -1,6 +1,6 @@
-import '/ais_decoder.dart';
-import '/src/utils/binary_conversion.dart';
-import '/src/utils/coordinate_utils.dart';
+import '../../../ais_decoder.dart';
+import '../../utils/binary_conversion.dart';
+import '../../utils/coordinate_utils.dart';
 
 class BaseStationReport extends AISMessage {
   final int year;
