@@ -10,47 +10,54 @@ import 'src/utils/debug_prints.dart';
 
 class MessageFactory {
   static AISMessage create(String input, bool logging, bool legacy) {
-    String binary = '';
+    String encoded = '';
 
     //region sanitizing
+
+    //legacy method to create binary String from input String
+    String makeBinaryString(String input) {
+      String binaryOutput = '';
+      for (String char in input.split('')) {
+        binaryOutput += convertCharToBinary(char);
+      }
+      return binaryOutput;
+    }
+    
     if(input.isEmpty) {
       throw InvalidBinaryDataException(
           "Supplied String is empty or undefined!");
     }
 
     if(input.contains("!AIVDM") || input.contains("!AIVDO")) {
-      // print("Supplied !AIVDM String - Converting...");
 
       List<String> fields = input.split(',');
 
       // When logging is enabled print logging
       if(logging) DebugPrinter(fields: fields).debugPrint();
-
-
+      
       // Legacy Mode:
       if(legacy) {
-        for (String char in fields[5].split('')) {
-          binary += convertCharToBinary(char);
-        }
+        encoded = makeBinaryString(fields[5]);
       } else {
-        binary = fields[5];
+        encoded = fields[5];
       }
+      
     } else {
       // fallback if no AIVDM String is found
-      binary = input;
+      encoded = input;
     }
 
     // minimum length for mmsi part of sentence
-    if(legacy && binary.length < 38) {
-      throw InvalidBinaryDataException("Supplied binary String too short (${binary.length} bits)!");
+    if(legacy && encoded.length < 38) {
+      throw InvalidBinaryDataException("Supplied binary String too short (${encoded.length} bits)!");
     }
     //endregion
 
     try {
       // get message type
-      int messageType = legacy ? int.parse(binary.substring(0,6), radix: 2) : getUintDirect(binary, 0, 6);
-      int messagePart = legacy ? int.parse(binary.substring(38, 40), radix: 2) : getUintDirect(binary, 38, 40);
-      if(messageType == 24) { messagePart = legacy ? int.parse(binary.substring(38, 40), radix: 2) : getUintDirect(binary, 38, 40); }
+      int messageType = legacy ? int.parse(encoded.substring(0,6), radix: 2) : getUintDirect(encoded, 0, 6);
+      int messagePart = legacy ? int.parse(encoded.substring(38, 40), radix: 2) : getUintDirect(encoded, 38, 40);
+      if(messageType == 24) { messagePart = legacy ? int.parse(encoded.substring(38, 40), radix: 2) : getUintDirect(encoded, 38, 40); }
 
       // switch to correct message type handling scenario
       if(!legacy) {
@@ -58,29 +65,29 @@ class MessageFactory {
         return switch (messageType) {
 
         // Position reports
-          1 || 2 || 3 => PositionMessage.fromEncoded(binary),
-          18 => StandardClassBCSPositionReport.fromBinary(binary),
-          19 => ExtendedClassBCSPositionReport.fromBinary(binary),
-          27 => LongRangeAISBroadcastMessage.fromBinary(binary),
+          1 || 2 || 3 => PositionMessage.fromEncoded(encoded),
+          18 => StandardClassBCSPositionReport.fromBinary(makeBinaryString(encoded)),
+          19 => ExtendedClassBCSPositionReport.fromBinary(makeBinaryString(encoded)),
+          27 => LongRangeAISBroadcastMessage.fromBinary(makeBinaryString(encoded)),
 
         // Static data
-          5 => StaticAndVoyageRelatedData.fromEncoded(binary),
+          5 => StaticAndVoyageRelatedData.fromEncoded(encoded),
           24 => messagePart == 0
-              ? StaticDataReportA.fromBinary(binary)
-              : StaticDataReportB.fromBinary(binary),
+              ? StaticDataReportA.fromBinary(makeBinaryString(encoded))
+              : StaticDataReportB.fromBinary(makeBinaryString(encoded)),
 
         // Safety src.messages
-        // 12 => AddressedSafetyRelatedMessage.fromEncoded(binary),
-        // 13 => SafetyRelatedAcknowledgement.fromEncoded(binary),
-        // 14 => SafetyRelatedBroadcastMessage.fromEncoded(binary),
+        // 12 => AddressedSafetyRelatedMessage.fromEncoded(encoded),
+        // 13 => SafetyRelatedAcknowledgement.fromEncoded(encoded),
+        // 14 => SafetyRelatedBroadcastMessage.fromEncoded(encoded),
 
         // Specialized
-          4 => BaseStationReport.fromBinary(binary),
-        // 21 => AidToNavigationReport.fromEncoded(binary),
+          4 => BaseStationReport.fromBinary(makeBinaryString(encoded)),
+        // 21 => AidToNavigationReport.fromEncoded(encoded),
 
         // Binary src.messages
-        // 6 => BinaryAddressedMessage.fromEncoded(binary),
-        // 8 => BinaryBroadcastMessage.fromEncoded(binary),*/
+        // 6 => BinaryAddressedMessage.fromEncoded(encoded),
+        // 8 => BinaryBroadcastMessage.fromEncoded(encoded),*/
 
           _ => throw UnsupportedMessageTypeException(messageType),
         };
@@ -88,30 +95,30 @@ class MessageFactory {
         return switch (messageType) {
 
         // Position reports
-          1 || 2 || 3 => PositionMessage.fromBinary(binary),
-          18 => StandardClassBCSPositionReport.fromBinary(binary),
-          19 => ExtendedClassBCSPositionReport.fromBinary(binary),
-          27 => LongRangeAISBroadcastMessage.fromBinary(binary),
+          1 || 2 || 3 => PositionMessage.fromBinary(encoded),
+          18 => StandardClassBCSPositionReport.fromBinary(encoded),
+          19 => ExtendedClassBCSPositionReport.fromBinary(encoded),
+          27 => LongRangeAISBroadcastMessage.fromBinary(encoded),
 
         // Static data
-          5 => StaticAndVoyageRelatedData.fromBinary(binary),
+          5 => StaticAndVoyageRelatedData.fromBinary(encoded),
           24 =>
           messagePart == 0
-              ? StaticDataReportA.fromBinary(binary)
-              : StaticDataReportB.fromBinary(binary),
+              ? StaticDataReportA.fromBinary(encoded)
+              : StaticDataReportB.fromBinary(encoded),
 
         // Safety src.messages
-        // 12 => AddressedSafetyRelatedMessage.fromBinary(binary),
-        // 13 => SafetyRelatedAcknowledgement.fromBinary(binary),
-        // 14 => SafetyRelatedBroadcastMessage.fromBinary(binary),
+        // 12 => AddressedSafetyRelatedMessage.fromBinary(encoded),
+        // 13 => SafetyRelatedAcknowledgement.fromBinary(encoded),
+        // 14 => SafetyRelatedBroadcastMessage.fromBinary(encoded),
 
         // Specialized
-          4 => BaseStationReport.fromBinary(binary),
-        // 21 => AidToNavigationReport.fromBinary(binary),
+          4 => BaseStationReport.fromBinary(encoded),
+        // 21 => AidToNavigationReport.fromBinary(encoded),
 
         // Binary src.messages
-        // 6 => BinaryAddressedMessage.fromBinary(binary),
-        // 8 => BinaryBroadcastMessage.fromBinary(binary),*/
+        // 6 => BinaryAddressedMessage.fromBinary(encoded),
+        // 8 => BinaryBroadcastMessage.fromBinary(encoded),*/
 
           _ => throw UnsupportedMessageTypeException(messageType),
         };
