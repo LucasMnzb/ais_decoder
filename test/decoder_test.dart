@@ -178,6 +178,44 @@ void main() {
       expect(typed.timestamp, 55);
     });
   });
+  group('Type 24', () {
+    test('example 1', () {
+      final message = AISMessage.fromString(kType24Example1, legacy: true);
+      expect(message, isNotNull);
+      print('message: $message');
+      expect(message.messageType, 24);
+      expect(message.mmsi, 319199800);
+      expect(message.repeatIndicator, 0);
+      expect(message, isA<StaticDataReportA>());
+      final typed = message as StaticDataReportA;
+      expect(typed.partNumber, 0);
+      expect(typed.vesselName, 'GUTEE');
+      expect(typed.spare, 0);
+    });
+    test('example 2', () {
+      final message = AISMessage.fromString(kType24Example2, legacy: true);
+      expect(message, isNotNull);
+      print('message: $message');
+      expect(message.messageType, 24);
+      expect(message.mmsi, 219023680);
+      expect(message.repeatIndicator, 0);
+      expect(message, isA<StaticDataReportB>());
+      final typed = message as StaticDataReportB;
+      expect(typed.partNumber, 1);
+      expect(typed.vesselTypeInt, 37);
+      expect(typed.vesselType, 'Pleasure Craft');
+      expect(typed.vendorId, 'SRT');
+      expect(typed.unitModel, 1);
+      expect(typed.serialNumber, 96385);
+      expect(typed.callSign, 'XPH2610');
+      expect(typed.dimensionBow, 12);
+      expect(typed.dimensionStern, 1);
+      expect(typed.dimensionPort, 1);
+      expect(typed.dimensionStarboard, 1);
+      expect(typed.mothershipMMSI, 25169985);
+      expect(typed.spare, 60);
+    });
+  });
 }
 
 const kType1Example1 = '!AIVDM,1,1,,A,13lLUr02j01br3REUdh`eW3608Dn,0*52';
@@ -192,3 +230,6 @@ const kType5Example2Line1 =
 const kType5Example2Line2 = '!AIVDM,2,2,1,A,kQ2H8888880,2*65';
 const kType18Example1 = '!AIVDM,1,1,,B,B3`e<W@01hJMcvUIe3rWSwnUoP06,0*48';
 const kType18Example2 = '!AIVDM,1,1,,A,B46CbvP008JN885IfS;Q3wsUoP06,0*25';
+
+const kType24Example1 = '!AIVDM,1,1,,A,H4hJJ>0ME@DD000000000000000,2*46';
+const kType24Example2 = '!AIVDM,1,1,,A,H3@p9@4UCBD4GR1H@8jnih1P111t,0*31';
