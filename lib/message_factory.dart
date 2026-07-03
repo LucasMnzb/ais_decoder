@@ -7,9 +7,10 @@ import 'src/utils/debug_prints.dart';
 
 // ToDo: (For Release) Needs Extensive Documentation
 // ToDo: (High Priority) Currently only can deal with single Fragment style AIS Sentences. Needs to be updated to also support sentences with more than one fragment!
+// ToDo: (Medium Priority) isPayload should be later moved into a separate function if any more parameters become necessary, fine for now - for later documentation: isPayload bypasses the String splitting via , and just passes the payload directly into encoded.
 
 class MessageFactory {
-  static AISMessage create(String input, bool logging, bool legacy) {
+  static AISMessage create(String input, bool logging, bool legacy, bool isPayload) {
     String encoded = '';
 
     //region sanitizing
@@ -37,9 +38,9 @@ class MessageFactory {
       
       // Legacy Mode:
       if(legacy) {
-        encoded = makeBinaryString(fields[5]);
+        encoded = isPayload ? input : makeBinaryString(fields[5]);
       } else {
-        encoded = fields[5];
+        encoded = isPayload ? input : fields[5];
       }
       
     } else {

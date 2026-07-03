@@ -17,7 +17,10 @@ abstract class AISMessage {
   ///
   /// The enable debugging param is just for more extensive Logging output when developing, defaults to false!
   ///
-  /// Legacy mode uses the old conversion method to decode strings using concatenations, might yield slower results.
-  factory AISMessage.fromString(String input, {bool enableDebugging = false, legacy = false}) =>
-      MessageFactory.create(input, enableDebugging, legacy);
+  /// Legacy mode uses the old conversion method to decode strings using concatenations, might yield slower results and is not supported for all message types.
+  factory AISMessage.fromString(String input, {bool enableDebugging = false, bool legacy = false}) =>
+      MessageFactory.create(input, enableDebugging, legacy, false);
+
+  factory AISMessage.fromPayload(String input, {bool enableDebugging = false, bool legacy = false}) =>
+      MessageFactory.create(input, enableDebugging, legacy, true);
 }

@@ -41,6 +41,25 @@ void main() {
       expect(typed.timestamp, 46);
       expect(typed.raimEnabled, 1);
     });
+    test('example 3 - direct Payload', () {
+      final message = AISMessage.fromPayload(kType1Example3OnlyPayload);
+      expect(message, isNotNull);
+      expect(message.messageType, 1);
+      expect(message.mmsi, 241133000);
+      expect(message.repeatIndicator, 0);
+      expect(message, isA<PositionMessage>());
+      final typed = message as PositionMessage;
+      expect(typed.navigationStatus, 'Under way using engine');
+      expect(typed.latitude, 37.818638);
+      expect(typed.longitude, 23.494813);
+      expect(typed.speedOverGround, 15.1);
+      expect(typed.courseOverGround, 54.6);
+      expect(typed.maneuverIndicator, 'Not available (Default)');
+      expect(typed.rateOfTurn, isNaN);
+      expect(typed.heading, isNull);
+      expect(typed.timestamp, 46);
+      expect(typed.raimEnabled, 1);
+    });
   });
   group('Type 3', () {
     test('example 1', () {
@@ -220,6 +239,7 @@ void main() {
 
 const kType1Example1 = '!AIVDM,1,1,,A,13lLUr02j01br3REUdh`eW3608Dn,0*52';
 const kType1Example2 = '!AIVDM,1,1,,A,13UuUj0P2GQcS?hE`uKj8gwL2@KF,0*72';
+const kType1Example3OnlyPayload = '13UuUj0P2GQcS?hE`uKj8gwL2@KF';
 const kType3Example1 = '!AIVDM,1,1,,A,35MRrB10011cdC8EbwuT`Q4>0Dqb,0*6F';
 const kType3Example2 = '!AIVDM,1,1,,A,33dfE60PB11citDEMiief;0<00b0,0*21';
 const kType5Example1Line1 =
