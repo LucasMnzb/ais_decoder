@@ -74,8 +74,8 @@ class MessageFactory {
         // Static data
           5 => StaticAndVoyageRelatedData.fromEncoded(encoded),
           24 => messagePart == 0
-              ? StaticDataReportA.fromBinary(makeBinaryString(encoded))
-              : StaticDataReportB.fromBinary(makeBinaryString(encoded)),
+              ? StaticDataReportA.fromEncoded(encoded)
+              : StaticDataReportB.fromEncoded(encoded),
 
         // Safety src.messages
         // 12 => AddressedSafetyRelatedMessage.fromEncoded(encoded),

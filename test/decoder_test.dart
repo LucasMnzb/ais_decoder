@@ -234,6 +234,47 @@ void main() {
       expect(typed.mothershipMMSI, 25169985);
       expect(typed.spare, 60);
     });
+    test('example 3 - legacy Check Type A & B', () {
+      final messageALegacy = AISMessage.fromString(kType24Example1, legacy: true);
+      final messageA = AISMessage.fromString(kType24Example1, legacy: false);
+      expect(messageA, isNotNull);
+      expect(messageALegacy, isNotNull);
+      expect(messageA, equals(messageALegacy));
+      print('message: $messageA');
+      expect(messageA.messageType, 24);
+      expect(messageA.mmsi, 319199800);
+      expect(messageA.repeatIndicator, 0);
+      expect(messageA, isA<StaticDataReportA>());
+      final typedA = messageA as StaticDataReportA;
+      expect(typedA.partNumber, 0);
+      expect(typedA.vesselName, 'GUTEE');
+      expect(typedA.spare, 0);
+
+      final messageBLegacy = AISMessage.fromString(kType24Example2, legacy: true);
+      final messageB = AISMessage.fromString(kType24Example2, legacy: false);
+      expect(messageB, isNotNull);
+      expect(messageBLegacy, isNotNull);
+      expect(messageBLegacy, equals(messageB));
+      print('message: $messageB');
+      expect(messageB.messageType, 24);
+      expect(messageB.mmsi, 219023680);
+      expect(messageB.repeatIndicator, 0);
+      expect(messageB, isA<StaticDataReportB>());
+      final typedB = messageB as StaticDataReportB;
+      expect(typedB.partNumber, 1);
+      expect(typedB.vesselTypeInt, 37);
+      expect(typedB.vesselType, 'Pleasure Craft');
+      expect(typedB.vendorId, 'SRT');
+      expect(typedB.unitModel, 1);
+      expect(typedB.serialNumber, 96385);
+      expect(typedB.callSign, 'XPH2610');
+      expect(typedB.dimensionBow, 12);
+      expect(typedB.dimensionStern, 1);
+      expect(typedB.dimensionPort, 1);
+      expect(typedB.dimensionStarboard, 1);
+      expect(typedB.mothershipMMSI, 25169985);
+      expect(typedB.spare, 60);
+    });
   });
 }
 
