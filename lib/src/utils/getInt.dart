@@ -21,7 +21,7 @@ int getUintDirect(String encoded, int startBit, int endBit) {
       chunk = (aisValue >> shiftAmount) & mask;
     }
 
-    value = value * (1 << bitsToTake) + chunk; // multiply, not <<, for web safety
+    value = value * (1 << bitsToTake) + chunk; // multiply, not <<, for web safety as this uses double when running on web, giving 2^52 instead of 2^32 which is important when fields (like mmsi) extend more than 32 bits.
     i += bitsToTake;
   }
   return value;
