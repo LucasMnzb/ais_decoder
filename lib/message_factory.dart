@@ -68,7 +68,7 @@ class MessageFactory {
         // Position reports
           1 || 2 || 3 => PositionMessage.fromEncoded(encoded),
           18 => StandardClassBCSPositionReport.fromEncoded(encoded),
-          19 => ExtendedClassBCSPositionReport.fromBinary(makeBinaryString(encoded)),
+          19 => ExtendedClassBCSPositionReport.fromEncoded(encoded),
           27 => LongRangeAISBroadcastMessage.fromEncoded(encoded),
 
         // Static data

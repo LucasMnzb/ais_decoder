@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:ais_decoder/ais_decoder.dart';
 import 'package:test/test.dart';
 
@@ -209,6 +207,20 @@ void main() {
       expect(message, isA<StandardClassBCSPositionReport>());
     });
   });
+  group('Type 19', () {
+    test('example 1', () {
+      final message = AISMessage.fromString(kType19Example1);
+      final messageLegacy = AISMessage.fromString(kType19Example1, legacy: true);
+      expect(message, isNotNull);
+      expect(message.messageType, 19);
+      expect(message, equals(messageLegacy));
+      expect(message, isA<ExtendedClassBCSPositionReport>());
+      final typed = message as ExtendedClassBCSPositionReport;
+      expect(typed.heading, null);
+      expect(typed.speedOverGround, 8.7);
+      print(typed);
+    });
+  });
   group('Type 24', () {
     test('example 1', () {
       final message = AISMessage.fromString(kType24Example1, legacy: true);
@@ -315,6 +327,8 @@ const kType5Example2Line1 =
 const kType5Example2Line2 = '!AIVDM,2,2,1,A,kQ2H8888880,2*65';
 const kType18Example1 = '!AIVDM,1,1,,B,B3`e<W@01hJMcvUIe3rWSwnUoP06,0*48';
 const kType18Example2 = '!AIVDM,1,1,,A,B46CbvP008JN885IfS;Q3wsUoP06,0*25';
+
+const kType19Example1 = '!AIVDM,1,1,,B,C5N3SRgPEnJGEBT>NhWAwwo862PaLELTBJ:V00000000S0D:R220,0*0B';
 
 const kType24Example1 = '!AIVDM,1,1,,A,H4hJJ>0ME@DD000000000000000,2*46';
 const kType24Example2 = '!AIVDM,1,1,,A,H3@p9@4UCBD4GR1H@8jnih1P111t,0*31';
