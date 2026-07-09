@@ -1,10 +1,9 @@
 import '../../../ais_decoder.dart';
 import '../../utils/coordinate_utils.dart';
-
+import '../../utils/getInt.dart';
 
 // ToDo: Implement missing 9 possibly sent data points!
 class StandardClassBCSPositionReport extends AISMessage {
-
   final double? latitude;
   final double? longitude;
   final double? speedOverGround;
@@ -29,7 +28,8 @@ class StandardClassBCSPositionReport extends AISMessage {
   });
 
   @override
-  String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Heading: $heading, Accuracy: $positionAccuracy, Lat: $latitude, Lon: $longitude, COG: $courseOverGround, RAIM: $raimFlag, SOG: $speedOverGround, Timestamp: $timestamp)';
+  String toString() =>
+      'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Heading: $heading, Accuracy: $positionAccuracy, Lat: $latitude, Lon: $longitude, COG: $courseOverGround, RAIM: $raimFlag, SOG: $speedOverGround, Timestamp: $timestamp)';
 
   factory StandardClassBCSPositionReport.fromBinary(String binary) {
     // common
@@ -49,16 +49,62 @@ class StandardClassBCSPositionReport extends AISMessage {
 
     // conversion to actually readable data
     int headingDecoded = int.parse(headingBin, radix: 2);
-    double? heading = 0 <= headingDecoded && headingDecoded < 360 ? headingDecoded.toDouble() : null;
+    double? heading = 0 <= headingDecoded && headingDecoded < 360
+        ? headingDecoded.toDouble()
+        : null;
     int positionAccuracy = int.parse(positionAccuracyBin, radix: 2);
     int raimFlag = int.parse(raimFlagBin, radix: 2);
     double? longitude = CoordinateUtils().calculateLongitude(longitudeBin);
     double? latitude = CoordinateUtils().calculateLatitude(latitudeBin);
     int speedDecoded = int.parse(speedBin, radix: 2);
-    double? speed = 0 <= speedDecoded && speedDecoded <= 1022 ? speedDecoded / 10.0 : null;
+    double? speed =
+        0 <= speedDecoded && speedDecoded <= 1022 ? speedDecoded / 10.0 : null;
     int courseDecoded = int.parse(courseBin, radix: 2);
-    double? course = 0 <= courseDecoded && courseDecoded < 3600 ? courseDecoded / 10.0 : null;
+    double? course = 0 <= courseDecoded && courseDecoded < 3600
+        ? courseDecoded / 10.0
+        : null;
     int timestamp = int.parse(timestampBin, radix: 2);
+
+    return StandardClassBCSPositionReport(
+      messageType: messageType,
+      mmsi: mmsi,
+      repeatIndicator: repeatIndicator,
+      heading: heading,
+      positionAccuracy: positionAccuracy,
+      longitude: longitude,
+      latitude: latitude,
+      courseOverGround: course,
+      raimFlag: raimFlag,
+      speedOverGround: speed,
+      timestamp: timestamp,
+    );
+  }
+
+  factory StandardClassBCSPositionReport.fromEncoded(String encoded) {
+    int messageType = getUintDirect(encoded, 0, 6);
+    int repeatIndicator = getUintDirect(encoded, 6, 8);
+    int mmsi = getUintDirect(encoded, 8, 38);
+    int speedRaw = getUintDirect(encoded, 46, 56);
+    int positionAccuracy = getUintDirect(encoded, 56, 57);
+    int longitudeRaw = getSignedIntDirect(encoded, 57, 85);
+    int latitudeRaw = getSignedIntDirect(encoded, 85, 112);
+    int courseRaw = getUintDirect(encoded, 112, 124);
+    int headingRaw = getUintDirect(encoded, 124, 133);
+    int timestamp = getUintDirect(encoded, 133, 139);
+    int raimFlag = getUintDirect(encoded, 147, 148);
+
+    // conversion to actually readable data
+    double? heading =
+        0 <= headingRaw && headingRaw < 360 ? headingRaw.toDouble() : null;
+    const int nrLongitudeBits = 85 - 57;
+    double? longitude = CoordinateUtils()
+        .calculateLongitudeDirect(longitudeRaw, nrLongitudeBits);
+    const int nrLatitudeBits = 112 - 85;
+    double? latitude =
+        CoordinateUtils().calculateLatitudeDirect(latitudeRaw, nrLatitudeBits);
+    double? speed = 0 <= speedRaw && speedRaw <= 1022 ? speedRaw / 10.0 : null;
+    double? course =
+        0 <= courseRaw && courseRaw < 3600 ? courseRaw / 10.0 : null;
 
     return StandardClassBCSPositionReport(
       messageType: messageType,
