@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:ais_decoder/ais_decoder.dart';
 import 'package:test/test.dart';
 
@@ -196,6 +198,16 @@ void main() {
       expect(typed.speedOverGround, 0.0);
       expect(typed.timestamp, 55);
     });
+    test('test equality of Type 18 examples legacy', () {
+      final message = AISMessage.fromString(kType18Example1);
+      final messageLegacy = AISMessage.fromString(kType18Example1, legacy: true);
+      expect(message, isNotNull);
+      expect(message, equals(messageLegacy));
+      expect(message.messageType, 18);
+      expect(message.mmsi, 244010141);
+      expect(message.repeatIndicator, 0);
+      expect(message, isA<StandardClassBCSPositionReport>());
+    });
   });
   group('Type 24', () {
     test('example 1', () {
@@ -276,6 +288,18 @@ void main() {
       expect(typedB.spare, 60);
     });
   });
+  group('Type 27', () {
+    test('example 1', () {
+      final message = AISMessage.fromString(kType27Example1);
+      final messageLegacy = AISMessage.fromString(kType27Example1, legacy: true);
+      expect(message, isNotNull);
+      expect(message.messageType, 27);
+      expect(message, equals(messageLegacy));
+      expect(message, isA<LongRangeAISBroadcastMessage>());
+      final typed = message as LongRangeAISBroadcastMessage;
+      print(typed);
+    });
+  });
 }
 
 const kType1Example1 = '!AIVDM,1,1,,A,13lLUr02j01br3REUdh`eW3608Dn,0*52';
@@ -294,3 +318,5 @@ const kType18Example2 = '!AIVDM,1,1,,A,B46CbvP008JN885IfS;Q3wsUoP06,0*25';
 
 const kType24Example1 = '!AIVDM,1,1,,A,H4hJJ>0ME@DD000000000000000,2*46';
 const kType24Example2 = '!AIVDM,1,1,,A,H3@p9@4UCBD4GR1H@8jnih1P111t,0*31';
+
+const kType27Example1 = '!AIVDM,1,1,,A,KCQ9r=hrFUnH7P00,0*41';

@@ -7,6 +7,14 @@ class UnsupportedMessageTypeException implements Exception {
   String toString() => 'Unsupported AIS Message Type: $messageType';
 }
 
+class UnsupportedMessageTypeExceptionLegacy implements Exception {
+  final int messageType;
+  UnsupportedMessageTypeExceptionLegacy(this.messageType);
+
+  @override
+  String toString() => 'Unsupported AIS Message Type in legacy mode: $messageType, check if supported without legacy';
+}
+
 /// Custom Exception for invalid binary data
 class InvalidBinaryDataException implements Exception {
   final String reason;

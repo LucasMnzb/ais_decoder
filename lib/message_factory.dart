@@ -44,7 +44,7 @@ class MessageFactory {
       }
       
     } else {
-      // fallback if no AIVDM String is found
+      // fallback if no AIVDM String is found aka is payload
       encoded = input;
     }
 
@@ -67,9 +67,9 @@ class MessageFactory {
 
         // Position reports
           1 || 2 || 3 => PositionMessage.fromEncoded(encoded),
-          18 => StandardClassBCSPositionReport.fromBinary(makeBinaryString(encoded)),
+          18 => StandardClassBCSPositionReport.fromEncoded(encoded),
           19 => ExtendedClassBCSPositionReport.fromBinary(makeBinaryString(encoded)),
-          27 => LongRangeAISBroadcastMessage.fromBinary(makeBinaryString(encoded)),
+          27 => LongRangeAISBroadcastMessage.fromEncoded(encoded),
 
         // Static data
           5 => StaticAndVoyageRelatedData.fromEncoded(encoded),
@@ -108,20 +108,10 @@ class MessageFactory {
               ? StaticDataReportA.fromBinary(encoded)
               : StaticDataReportB.fromBinary(encoded),
 
-        // Safety src.messages
-        // 12 => AddressedSafetyRelatedMessage.fromBinary(encoded),
-        // 13 => SafetyRelatedAcknowledgement.fromBinary(encoded),
-        // 14 => SafetyRelatedBroadcastMessage.fromBinary(encoded),
-
         // Specialized
           4 => BaseStationReport.fromBinary(encoded),
-        // 21 => AidToNavigationReport.fromBinary(encoded),
 
-        // Binary src.messages
-        // 6 => BinaryAddressedMessage.fromBinary(encoded),
-        // 8 => BinaryBroadcastMessage.fromBinary(encoded),*/
-
-          _ => throw UnsupportedMessageTypeException(messageType),
+          _ => throw UnsupportedMessageTypeExceptionLegacy(messageType),
         };
       }
 
@@ -133,6 +123,9 @@ class MessageFactory {
 
   // Helper method to check if a message type is supported ToDo: Update
   static bool isSupported(int messageType) {
+    return [1, 2, 3, 4, 5, 18, 19, 24, 27].contains(messageType);
+  }
+  static bool isSupportedByLegacy(int messageType) {
     return [1, 2, 3, 4, 5, 18, 19, 24, 27].contains(messageType);
   }
 

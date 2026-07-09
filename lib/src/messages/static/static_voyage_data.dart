@@ -115,6 +115,7 @@ class StaticAndVoyageRelatedData extends AISMessage {
   
   //endregion
 
+  @Deprecated("Legacy Code use .fromEncoded instead for performance reasons")
   factory StaticAndVoyageRelatedData.fromBinary(String binaryInput) {
     String binary = binaryInput.padRight(424, '0'); // add padding of zeroes if second part got truncated for some f*ck-all reasons...
 
