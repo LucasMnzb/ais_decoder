@@ -1,3 +1,7 @@
+## 1.0.1'
+
+* Minor refactor to comply to Darts linting rules.
+
 ## 1.0.0
 
 * First stable release — all 27 ITU-R M.1371 message types implemented and tested.
