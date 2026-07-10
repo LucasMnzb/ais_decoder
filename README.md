@@ -1,5 +1,10 @@
 # AIS Decoder
 
+[![pub.dev](https://img.shields.io/pub/v/ais_decoder.svg)](https://pub.dev/packages/ais_decoder)
+[![likes](https://img.shields.io/pub/likes/ais_decoder)](https://pub.dev/packages/ais_decoder/score)
+[![popularity](https://img.shields.io/pub/popularity/ais_decoder)](https://pub.dev/packages/ais_decoder/score)
+[![pub points](https://img.shields.io/pub/points/ais_decoder)](https://pub.dev/packages/ais_decoder/score)
+
 A comprehensive AIS (Automatic Identification System) message decoder library for Dart and Flutter applications.
 
 ## About
@@ -50,7 +55,7 @@ Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  ais_decoder: ^0.1.0
+  ais_decoder: ^1.0.0
 ```
 
 Then run:

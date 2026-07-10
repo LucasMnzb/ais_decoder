@@ -1,5 +1,10 @@
 ## 1.0.0
-* Major Version - written extensive documentation pub.dev ready.
+
+* First stable release — all 27 ITU-R M.1371 message types implemented and tested.
+* Added working pub.dev example (`example/example.dart`).
+* Expanded documentation and API dartdoc comments across all public types.
+* Stable public API: `AISMessage.fromString()` and `AISMessage.fromPayload()` are
+  considered stable going forward.
 
 ## 0.1.2
 

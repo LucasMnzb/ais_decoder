@@ -2,7 +2,7 @@ name: ais_decoder
 description: >-
   A comprehensive AIS (Automatic Identification System) message decoder for Dart and Flutter.
   Decode NMEA AIS sentences into structured Dart objects for maritime applications.
-version: 0.1.2
+version: 1.0.0
 homepage: https://github.com/LucasMnzb/ais_decoder
 repository: https://github.com/LucasMnzb/ais_decoder
 issue_tracker: https://github.com/LucasMnzb/ais_decoder/issues
