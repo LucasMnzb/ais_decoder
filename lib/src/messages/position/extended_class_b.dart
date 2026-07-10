@@ -302,7 +302,7 @@ class ExtendedClassBCSPositionReport extends AISMessage {
     int dimensionPort = getUintDirect(binary, 289, 295);
     int dimensionStarboard = getUintDirect(binary, 295, 301);
     String epfdFixType = BinaryConverter().getEPFDFixTypeDirect(getUintDirect(binary, 301, 305));
-    int RAIMFlag = getUintDirect(binary, 305, 306);
+    int raimFlag = getUintDirect(binary, 305, 306);
     int dte = getUintDirect(binary, 306, 307);
     int assignedMode = getUintDirect(binary, 307, 308);
     int spare = getUintDirect(binary, 308, 312);
@@ -325,7 +325,7 @@ class ExtendedClassBCSPositionReport extends AISMessage {
       longitude: longitude,
       latitude: latitude,
       courseOverGround: course,
-      raimFlag: RAIMFlag,
+      raimFlag: raimFlag,
       speedOverGround: speed,
       timestamp: timestamp,
       regionalReserved: regionalReserved,

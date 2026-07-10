@@ -12,7 +12,7 @@ class UtcDateInquiry extends AISMessage {
   final int spare;
 
   /// MMSI of the station being asked to provide UTC date and time.
-  final destinationMmsi;
+  final int destinationMmsi;
 
   /// Reserved spare bits (bits 70–71). Should be zero.
   final int spare2;
