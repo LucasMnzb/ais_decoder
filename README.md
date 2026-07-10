@@ -25,13 +25,14 @@ This library decodes NMEA AIS sentences (AIVDM format) into structured Dart obje
 - **Type 12, 13, 14**: Safety Related Messages
 - **Type 18, 19**: Standard Class B Position Reports
 - **Type 24**: Static Data Reports (multipart)
+- **Type 25, 26**: Single and Multiple Slot Binary Messages
 - **Type 27**: Long Range AIS Broadcast Messages
 
 ## Roadmap
 
 - [ ] All 27+ standard AIS message types
 - [x] Binary message support (Types 6, 8)
-- [ ] Specialized Binary message support (Types 25, 26)
+- [x] Specialized Binary message support (Types 25, 26)
 - [ ] Aid to Navigation messages (Type 21)
 - [x] Base Station messages (Type 4)
 - [x] Comprehensive test coverage

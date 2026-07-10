@@ -1,4 +1,6 @@
 import 'package:ais_decoder/ais_decoder.dart';
+import 'package:ais_decoder/src/messages/binary/multiple_slot_binary_message.dart';
+import 'package:ais_decoder/src/messages/binary/single_slot_binary_message.dart';
 import 'package:ais_decoder/src/messages/position/sar_aircraft_position_report.dart';
 import 'package:ais_decoder/src/messages/safety/addressed_safety_related_message.dart';
 import 'package:ais_decoder/src/messages/time/utc_date_inquiry.dart';
@@ -355,6 +357,26 @@ void main() {
       expect(typedB.spare, 60);
     });
   });
+  group('Type 25', () {
+    test('example 1', () {
+      final message = AISMessage.fromString(kType25Example1);
+      expect(message, isNotNull);
+      expect(message.messageType, 25);
+      expect(message, isA<SingleSlotBinaryMessage>());
+      final typed = message as SingleSlotBinaryMessage;;
+      print(typed);
+    });
+  });
+  group('Type 26', () {
+    test('example 1', () {
+      final message = AISMessage.fromString(kType26Example1);
+      expect(message, isNotNull);
+      expect(message.messageType, 26);
+      expect(message, isA<MultipleSlotBinaryMessage>());
+      final typed = message as MultipleSlotBinaryMessage;;
+      print(typed);
+    });
+  });
   group('Type 27', () {
     test('example 1', () {
       final message = AISMessage.fromString(kType27Example1);
@@ -399,5 +421,8 @@ const kType19Example1 = '!AIVDM,1,1,,B,C5N3SRgPEnJGEBT>NhWAwwo862PaLELTBJ:V00000
 
 const kType24Example1 = '!AIVDM,1,1,,A,H4hJJ>0ME@DD000000000000000,2*46';
 const kType24Example2 = '!AIVDM,1,1,,A,H3@p9@4UCBD4GR1H@8jnih1P111t,0*31';
+
+const kType25Example1 = '!AIVDM,1,1,,A,I6SWo?8P00a3PKpEKEVj0?vNP<65,0*73';
+const kType26Example1 = '!AIVDM,1,1,,A,J1@@0IK70PGgT740000000000@000?D0ih1e00006JlPC9C3,0*6B';
 
 const kType27Example1 = '!AIVDM,1,1,,A,KCQ9r=hrFUnH7P00,0*41';
