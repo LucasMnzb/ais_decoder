@@ -127,7 +127,7 @@ class MessageFactory {
 
   // Helper method to check if a message type is supported ToDo: Update
   static bool isSupported(int messageType) {
-    return [1, 2, 3, 4, 5, 6, 18, 19, 24, 27].contains(messageType);
+    return [1, 2, 3, 4, 5, 6, 7, 8, 18, 19, 24, 27].contains(messageType);
   }
   static bool isSupportedByLegacy(int messageType) {
     return [1, 2, 3, 4, 5, 18, 19, 24, 27].contains(messageType);
@@ -135,6 +135,6 @@ class MessageFactory {
 
   // Helper method to get supported message types ToDo: Update
   static List<int> getSupportedTypes() {
-    return [1, 2, 3, 4, 5, 6, 18, 19, 24, 27];
+    return [1, 2, 3, 4, 5, 6, 7, 8, 18, 19, 24, 27];
   }
 }

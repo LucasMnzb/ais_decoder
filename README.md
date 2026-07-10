@@ -17,7 +17,9 @@ This library decodes NMEA AIS sentences (AIVDM format) into structured Dart obje
 ## Currently Supported Message Types
 
 - **Type 1, 2, 3**: Position Reports (Class A vessels)
+- **Type 4**: Base Station Messages
 - **Type 5**: Static and Voyage Related Data
+- **Type 6, 7, 8**: Binary Messages
 - **Type 18, 19**: Standard Class B Position Reports
 - **Type 24**: Static Data Reports (multipart)
 - **Type 27**: Long Range AIS Broadcast Messages
@@ -52,6 +54,7 @@ dart pub get
 
 ### Basic Decoding
 
+Full message decoding:
 ```dart
 import 'package:ais_decoder/ais_decoder.dart';
 
@@ -68,14 +71,37 @@ if (message is PositionMessage) {
 }
 ```
 
+Only payload decoding:
+```dart
+import 'package:ais_decoder/ais_decoder.dart';
+
+// Decode a single NMEA sentence
+String aisPayload = "13u?etPv2;0n:dDPwUM1U1Cb069D";
+AISMessage message = AISMessage.fromPayload(aisPayload);
+
+// Cast to specific message type for detailed data
+if (message is PositionMessage) {
+  print('Latitude: ${message.latitude}');
+  print('Longitude: ${message.longitude}');
+  print('Speed: ${message.speedOverGround} knots');
+  print('Course: ${message.courseOverGround}°');
+}
+```
+
+Integrates neatly with the ```nmea``` package.
+
 ### Multipart Messages
 
-**Important** As of this version Multipart messages are not directly supported.
+For Multipart message decoding (Type 5) please combine the two payloads manually.
 
-For Multipart message decoding (Type 5) please just combine the two payloads manually.
+(Example):  !AIVDM,2,1,0,B,55M67F@000004?78000P59HET0000000000000001P,0*0C 
 
-(Example):  !AIVDM,2,1,0,B,55M67F@000004?78000P59HET0000000000000001P,0*0C + !AIVDM,2,2,0,B,<<<70P0N4m1E52CP00,2*3B
-            
+plus
+
+!AIVDM,2,2,0,B,<<<70P0N4m1E52CP00,2*3B
+    
+become
+        
 !AIVDM,2,1,0,B,55M67F@000004?78000P59HET0000000000000001P<<<70P0N4m1E52CP00,0*20
 
 A utility class for this will be provided in a future release.
@@ -100,6 +126,15 @@ Full binary decoding is part of the roadmap.
 // Enable debug output for troubleshooting
 AISMessage message = AISMessage.fromString(aisMessage, enableDebugging: true);
 ```
+
+### Legacy Mode
+```dart
+// Enable legacy mode for whatever
+AISMessage message = AISMessage.fromString(aisMessage, legacy: true);
+```
+
+Legacy mode is (as of version 0.1.1) **deprecated**. It uses a slower decoding logic and as such should not be used besides testing purposes.
+Legacy mode does not and will not support all message types.
 
 ## Contributing
 
