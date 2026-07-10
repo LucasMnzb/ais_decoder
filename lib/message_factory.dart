@@ -1,4 +1,7 @@
 import 'package:ais_decoder/ais_decoder.dart';
+import 'package:ais_decoder/src/messages/binary/binary_acknowledge.dart';
+import 'package:ais_decoder/src/messages/binary/binary_addressed_message.dart';
+import 'package:ais_decoder/src/messages/binary/binary_broadcast_message.dart';
 import 'package:ais_decoder/src/utils/getInt.dart';
 import 'src/utils/convert_char_to_bin.dart';
 import 'src/utils/debug_prints.dart';
@@ -83,12 +86,13 @@ class MessageFactory {
         // 14 => SafetyRelatedBroadcastMessage.fromEncoded(encoded),
 
         // Specialized
-          4 => BaseStationReport.fromBinary(makeBinaryString(encoded)),
+          4 => BaseStationReport.fromEncoded(encoded),
         // 21 => AidToNavigationReport.fromEncoded(encoded),
 
         // Binary src.messages
-        // 6 => BinaryAddressedMessage.fromEncoded(encoded),
-        // 8 => BinaryBroadcastMessage.fromEncoded(encoded),*/
+        6 => BinaryAddressedMessage.fromEncoded(encoded),
+        7 => BinaryAcknowledge.fromEncoded(encoded),
+        8 => BinaryBroadcastMessage.fromEncoded(encoded),
 
           _ => throw UnsupportedMessageTypeException(messageType),
         };
@@ -123,7 +127,7 @@ class MessageFactory {
 
   // Helper method to check if a message type is supported ToDo: Update
   static bool isSupported(int messageType) {
-    return [1, 2, 3, 4, 5, 18, 19, 24, 27].contains(messageType);
+    return [1, 2, 3, 4, 5, 6, 18, 19, 24, 27].contains(messageType);
   }
   static bool isSupportedByLegacy(int messageType) {
     return [1, 2, 3, 4, 5, 18, 19, 24, 27].contains(messageType);
@@ -131,6 +135,6 @@ class MessageFactory {
 
   // Helper method to get supported message types ToDo: Update
   static List<int> getSupportedTypes() {
-    return [1, 2, 3, 4, 5, 18, 19, 24, 27];
+    return [1, 2, 3, 4, 5, 6, 18, 19, 24, 27];
   }
 }

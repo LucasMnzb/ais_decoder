@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 int getUintDirect(String encoded, int startBit, int endBit) {
   int value = 0;
   int i = startBit;
@@ -34,4 +36,17 @@ int getSignedIntDirect(String encoded, int startBit, int endBit) {
     value -= (1 << length);                                // reinterpret as negative
   }
   return value;
+}
+
+Uint8List getBytesDirect(String encoded, int startBit, int lengthInBits) {
+  final byteCount = (lengthInBits + 7) ~/ 8; // round up
+  final bytes = Uint8List(byteCount);
+  for (int i = 0; i < byteCount; i++) {
+    final chunkStart = startBit + i * 8;
+    final chunkEnd = (chunkStart + 8 <= startBit + lengthInBits)
+        ? chunkStart + 8
+        : startBit + lengthInBits; // last byte may be partial
+    bytes[i] = getUintDirect(encoded, chunkStart, chunkEnd) << (chunkStart + 8 - chunkEnd);
+  }
+  return bytes;
 }

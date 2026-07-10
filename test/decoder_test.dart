@@ -161,6 +161,22 @@ void main() {
       expect(typed.spare, 0);
     });
   });
+  group('Type 6,7,8 - binary', () {
+    test('examples 1, 2, 3', () {
+      final message6 = AISMessage.fromString(kType6Example1);
+      final message7 = AISMessage.fromString(kType7Example1);
+      final message8 = AISMessage.fromString(kType8Example1);
+      expect(message6, isNotNull);
+      expect(message7, isNotNull);
+      expect(message8, isNotNull);
+      expect(message6.messageType, 6);
+      expect(message7.messageType, 7);
+      expect(message8.messageType, 8);
+      expect(message6.mmsi, 150834090);
+      expect(message7.mmsi, 2655651);
+      expect(message8.mmsi, 366999712);
+    });
+  });
   group('Type 18', () {
     test('example 1', () {
       final message = AISMessage.fromString(kType18Example1);
@@ -325,6 +341,12 @@ const kType5Example1Line2 = '!AIVDM,2,2,0,B,88888888880,2*27';
 const kType5Example2Line1 =
     '!AIVDM,2,1,1,A,53R1dC01U0W9=KO;?F0p4I@Thu>22222222222166p=825bGN;PAAjCPH31C,0*2C';
 const kType5Example2Line2 = '!AIVDM,2,2,1,A,kQ2H8888880,2*65';
+
+//binary
+const kType6Example1 = '!AIVDM,1,1,,B,6B?n;be:cbapalgc;i6?Ow4,2*4A';
+const kType7Example1 = '!AIVDM,1,1,,A,702R5`hwCjq8,0*6B';
+const kType8Example1 = '!AIVDM,1,1,,A,85Mwp`1Kf3aCnsNvBWLi=wQuNhA5t43N`5nCuI=p<IBfVqnMgPGs,0*47';
+
 const kType18Example1 = '!AIVDM,1,1,,B,B3`e<W@01hJMcvUIe3rWSwnUoP06,0*48';
 const kType18Example2 = '!AIVDM,1,1,,A,B46CbvP008JN885IfS;Q3wsUoP06,0*25';
 

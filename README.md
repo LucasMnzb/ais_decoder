@@ -25,12 +25,14 @@ This library decodes NMEA AIS sentences (AIVDM format) into structured Dart obje
 ## Roadmap
 
 - [ ] All 27+ standard AIS message types
-- [ ] Binary message support (Types 6, 8, 25, 26)
+- [x] Binary message support (Types 6, 8)
+- [ ] Specialized Binary message support (Types 25, 26)
 - [ ] Aid to Navigation messages (Type 21)
 - [x] Base Station messages (Type 4)
-- [ ] Comprehensive test coverage
+- [x] Comprehensive test coverage
 - [x] Performance optimizations
 - [ ] Additional utility functions
+- [ ] Full Binary Data Decoding
 
 ## Installation
 
@@ -83,6 +85,14 @@ A utility class for this will be provided in a future release.
 Type 24 Messages appear as Part A and Part B in the wild. The decoder will take any Part as normal Input and return a StaticDataReportA or StaticDataReportB Object respectively.
 
 For Applications this means storing both Objects separately and then combining their data when needed - matching should be done via MMSI (existent in both Parts).
+
+### Binary Messages
+
+**Important** Binary Messages are not *directly* supported.
+
+The data will be decoded into one big Uint8List field to be interpreted by the application.
+
+Full binary decoding is part of the roadmap.
 
 ### Debug Mode
 
