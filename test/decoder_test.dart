@@ -1,9 +1,4 @@
 import 'package:ais_decoder/ais_decoder.dart';
-import 'package:ais_decoder/src/messages/binary/multiple_slot_binary_message.dart';
-import 'package:ais_decoder/src/messages/binary/single_slot_binary_message.dart';
-import 'package:ais_decoder/src/messages/position/sar_aircraft_position_report.dart';
-import 'package:ais_decoder/src/messages/safety/addressed_safety_related_message.dart';
-import 'package:ais_decoder/src/messages/time/utc_date_inquiry.dart';
 import 'package:test/test.dart';
 
 void main() {
