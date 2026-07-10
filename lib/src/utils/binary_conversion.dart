@@ -718,4 +718,44 @@ class BinaryConverter {
   }
   //endregion
 
+  //region Navigation Aid Types
+  /// Get an info on the navigation aid type - used in ais type 21.
+  String? navigationAidInfoDirect(int navigationAidCode) {
+    switch (navigationAidCode) {
+      case (0): return "Not available (Default)";
+      case (1): return "Reference Point";
+      case (2): return "RACON";
+      case (3): return "Fixed structure off shore (Oil Platform, Windfarm etc)";
+      case (4): return "Spare, Reserved for future use";
+      case (5): return "Light, without sectors";
+      case (6): return "Light, with sectors";
+      case (7): return "Leading Light Front";
+      case (8): return "Leading Light Rear";
+      case (9): return "Beacon, Cardinal N";
+      case (10): return "Beacon, Cardinal E";
+      case (11): return "Beacon, Cardinal S";
+      case (12): return "Beacon, Cardinal W";
+      case (13): return "Beacon, Port hand";
+      case (14): return "Beacon, Starboard hand";
+      case (15): return "Beacon, Preferred Channel port hand";
+      case (16): return "Beacon, Preferred Channel starboard hand";
+      case (17): return "Beacon, Isolated danger";
+      case (18): return "Beacon, Safe water";
+      case (19): return "Beacon, Special mark";
+      case (20): return "Cardinal Mark N";
+      case (21): return "Cardinal Mark E";
+      case (22): return "Cardinal Mark S";
+      case (23): return "Cardinal Mark W";
+      case (24): return "Port hand Mark";
+      case (25): return "Starboard hand Mark";
+      case (26): return "Preferred Channel Port hand";
+      case (27): return "Preferred Channel Starboard hand";
+      case (28): return "Isolated danger";
+      case (29): return "Safe Water";
+      case (30): return "Special Mark";
+      case (31): return "Light Vessel / LANBY / Rigs";
+      default: return "Unknown";
+    }
+  }
+  //endregion
 }

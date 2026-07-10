@@ -12,6 +12,7 @@ import 'package:ais_decoder/src/messages/position/sar_aircraft_position_report.d
 import 'package:ais_decoder/src/messages/safety/addressed_safety_related_message.dart';
 import 'package:ais_decoder/src/messages/safety/safety_related_acknowledgement.dart';
 import 'package:ais_decoder/src/messages/safety/safety_related_broadcast_message.dart';
+import 'package:ais_decoder/src/messages/specialized/aid_to_navigation.dart';
 import 'package:ais_decoder/src/messages/time/utc_date_inquiry.dart';
 import 'package:ais_decoder/src/messages/time/utc_date_response.dart';
 import 'package:ais_decoder/src/utils/getInt.dart';
@@ -100,7 +101,7 @@ class MessageFactory {
 
         // Specialized
           4 => BaseStationReport.fromEncoded(encoded),
-        // 21 => AidToNavigationReport.fromEncoded(encoded),
+          21 => AidToNavigationReport.fromEncoded(encoded),
 
         // Binary messages
           6 => BinaryAddressedMessage.fromEncoded(encoded),
@@ -152,7 +153,7 @@ class MessageFactory {
 
   // Helper method to check if a message type is supported ToDo: Update
   static bool isSupported(int messageType) {
-    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 25, 26, 27].contains(messageType);
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 24, 25, 26, 27].contains(messageType);
   }
   static bool isSupportedByLegacy(int messageType) {
     return [1, 2, 3, 4, 5, 18, 19, 24, 27].contains(messageType);
@@ -160,6 +161,6 @@ class MessageFactory {
 
   // Helper method to get supported message types ToDo: Update
   static List<int> getSupportedTypes() {
-    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 25, 26, 27];
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 24, 25, 26, 27];
   }
 }
