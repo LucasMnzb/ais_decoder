@@ -22,6 +22,7 @@ This library decodes NMEA AIS sentences (AIVDM format) into structured Dart obje
 - **Type 6, 7, 8**: Binary Messages
 - **Type 9**: SAR Aircraft Position Reports
 - **Type 10, 11**: UTC Date Inquiry and Response
+- **Type 12, 13, 14**: Safety Related Messages
 - **Type 18, 19**: Standard Class B Position Reports
 - **Type 24**: Static Data Reports (multipart)
 - **Type 27**: Long Range AIS Broadcast Messages

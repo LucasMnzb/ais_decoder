@@ -3,6 +3,9 @@ import 'package:ais_decoder/src/messages/binary/binary_acknowledge.dart';
 import 'package:ais_decoder/src/messages/binary/binary_addressed_message.dart';
 import 'package:ais_decoder/src/messages/binary/binary_broadcast_message.dart';
 import 'package:ais_decoder/src/messages/position/sar_aircraft_position_report.dart';
+import 'package:ais_decoder/src/messages/safety/addressed_safety_related_message.dart';
+import 'package:ais_decoder/src/messages/safety/safety_related_acknowledgement.dart';
+import 'package:ais_decoder/src/messages/safety/safety_related_broadcast_message.dart';
 import 'package:ais_decoder/src/messages/time/utc_date_inquiry.dart';
 import 'package:ais_decoder/src/messages/time/utc_date_response.dart';
 import 'package:ais_decoder/src/utils/getInt.dart';
@@ -85,22 +88,22 @@ class MessageFactory {
               : StaticDataReportB.fromEncoded(encoded),
 
         // Safety messages
-        // 12 => AddressedSafetyRelatedMessage.fromEncoded(encoded),
-        // 13 => SafetyRelatedAcknowledgement.fromEncoded(encoded),
-        // 14 => SafetyRelatedBroadcastMessage.fromEncoded(encoded),
+          12 => AddressedSafetyRelatedMessage.fromEncoded(encoded),
+          13 => SafetyRelatedAcknowledgement.fromEncoded(encoded),
+          14 => SafetyRelatedBroadcastMessage.fromEncoded(encoded),
 
         // Specialized
           4 => BaseStationReport.fromEncoded(encoded),
         // 21 => AidToNavigationReport.fromEncoded(encoded),
 
         // Binary messages
-        6 => BinaryAddressedMessage.fromEncoded(encoded),
-        7 => BinaryAcknowledge.fromEncoded(encoded),
-        8 => BinaryBroadcastMessage.fromEncoded(encoded),
+          6 => BinaryAddressedMessage.fromEncoded(encoded),
+          7 => BinaryAcknowledge.fromEncoded(encoded),
+          8 => BinaryBroadcastMessage.fromEncoded(encoded),
 
         // Time messages
-        10 => UtcDateInquiry.fromEncoded(encoded),
-        11 => UtcDateResponse.fromEncoded(encoded),
+          10 => UtcDateInquiry.fromEncoded(encoded),
+          11 => UtcDateResponse.fromEncoded(encoded),
 
           _ => throw UnsupportedMessageTypeException(messageType),
         };
@@ -135,7 +138,7 @@ class MessageFactory {
 
   // Helper method to check if a message type is supported ToDo: Update
   static bool isSupported(int messageType) {
-    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 18, 19, 24, 27].contains(messageType);
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 18, 19, 24, 27].contains(messageType);
   }
   static bool isSupportedByLegacy(int messageType) {
     return [1, 2, 3, 4, 5, 18, 19, 24, 27].contains(messageType);
@@ -143,6 +146,6 @@ class MessageFactory {
 
   // Helper method to get supported message types ToDo: Update
   static List<int> getSupportedTypes() {
-    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 18, 19, 24, 27];
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 18, 19, 24, 27];
   }
 }

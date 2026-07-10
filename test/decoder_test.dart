@@ -1,5 +1,7 @@
 import 'package:ais_decoder/ais_decoder.dart';
 import 'package:ais_decoder/src/messages/position/sar_aircraft_position_report.dart';
+import 'package:ais_decoder/src/messages/safety/addressed_safety_related_message.dart';
+import 'package:ais_decoder/src/messages/time/utc_date_inquiry.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -192,6 +194,28 @@ void main() {
       expect(typed.longitude, -6.278843);
     });
   });
+  group('Type 10 & 11', () {
+    test('example 1', () {
+      final message = AISMessage.fromString(kType10Example1);
+      expect(message, isNotNull);
+      expect(message.messageType, 10);
+      expect(message.mmsi, 366814480);
+      expect(message.repeatIndicator, 0);
+      expect(message, isA<UtcDateInquiry>());
+    });
+  });
+  group('Type 12, 13 & 14', () {
+    test('example 1', () {
+      final message = AISMessage.fromString(kType12Example1);
+      expect(message, isNotNull);
+      expect(message.messageType, 12);
+      expect(message.mmsi, 2275200);
+      expect(message.repeatIndicator, 0);
+      expect(message, isA<AddressedSafetyRelatedMessage>());
+      final typed = message as AddressedSafetyRelatedMessage;
+      expect(typed.text, 'PLEASE REPORT TO JOBOURG TRAFFIC CHANNEL 13 ');
+    });
+  });
   group('Type 18', () {
     test('example 1', () {
       final message = AISMessage.fromString(kType18Example1);
@@ -363,6 +387,10 @@ const kType7Example1 = '!AIVDM,1,1,,A,702R5`hwCjq8,0*6B';
 const kType8Example1 = '!AIVDM,1,1,,A,85Mwp`1Kf3aCnsNvBWLi=wQuNhA5t43N`5nCuI=p<IBfVqnMgPGs,0*47';
 
 const kType9Example1 = '!AIVDM,1,1,,B,91b55wi;hbOS@OdQAC062Ch2089h,0*30';
+
+const kType10Example1 = '!AIVDM,1,1,,B,:5MlU41GMK6@,0*6C';
+
+const kType12Example1= '!AIVDM,1,1,,A,<02:oP0kKcv0@<51C5PB5@?BDPD?P:?2?EB7PDB16693P381>>5<PikP,0*37';
 
 const kType18Example1 = '!AIVDM,1,1,,B,B3`e<W@01hJMcvUIe3rWSwnUoP06,0*48';
 const kType18Example2 = '!AIVDM,1,1,,A,B46CbvP008JN885IfS;Q3wsUoP06,0*25';

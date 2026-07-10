@@ -1,7 +1,7 @@
 import 'package:ais_decoder/ais_decoder.dart';
 import '../../utils/getInt.dart';
 
-class BinaryAcknowledge extends AISMessage {
+class SafetyRelatedAcknowledgement extends AISMessage {
   final int spare;
   final int mmsi1;
   final int mmsiSeq1;
@@ -13,7 +13,7 @@ class BinaryAcknowledge extends AISMessage {
   final int? mmsiSeq4;
 
 
-  BinaryAcknowledge({
+  SafetyRelatedAcknowledgement({
     required super.messageType,
     required super.mmsi,
     required super.repeatIndicator,
@@ -32,7 +32,7 @@ class BinaryAcknowledge extends AISMessage {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is BinaryAcknowledge &&
+    return other is SafetyRelatedAcknowledgement &&
         messageType == other.messageType &&
         mmsi == other.mmsi &&
         repeatIndicator == other.repeatIndicator &&
@@ -67,7 +67,7 @@ class BinaryAcknowledge extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Spare: $spare, MMSI1: $mmsi1, Seq1: $mmsiSeq1, MMSI2: $mmsi2, Seq2: $mmsiSeq2, MMSI3: $mmsi3, Seq3: $mmsiSeq3, MMSI4: $mmsi4, Seq4: $mmsiSeq4)';
   //endregion
 
-  factory BinaryAcknowledge.fromEncoded(String encoded) {
+  factory SafetyRelatedAcknowledgement.fromEncoded(String encoded) {
     String binary = encoded.padRight(168, '0');
 
     // common
@@ -75,7 +75,7 @@ class BinaryAcknowledge extends AISMessage {
     int repeatIndicator = getUintDirect(binary, 6, 8);
     int mmsi = getUintDirect(binary, 8, 38);
 
-    // type 7 specific
+    // type 12 specific
     int spare = getUintDirect(binary, 38, 40);
     int mmsi1 = getUintDirect(binary, 40, 70);
     int mmsiSeq1 = getUintDirect(binary, 70, 72);
@@ -86,7 +86,7 @@ class BinaryAcknowledge extends AISMessage {
     int mmsi4 = getUintDirect(binary, 136, 166);
     int mmsiSeq4 = getUintDirect(binary, 166, 168);
 
-    return BinaryAcknowledge(
+    return SafetyRelatedAcknowledgement(
       messageType: messageType,
       mmsi: mmsi,
       repeatIndicator: repeatIndicator,
