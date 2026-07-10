@@ -1,7 +1,5 @@
 import 'package:ais_decoder/ais_decoder.dart';
 
-import '../../../message_factory.dart';
-
 /// The base type for every decoded AIS message.
 ///
 /// All specific message types (e.g. [PositionMessage],
@@ -29,9 +27,6 @@ abstract class AISMessage {
   /// Decodes a full AIS sentence, such as a `!AIVDM`/`!AIVDO` NMEA string,
   /// into the appropriate [AISMessage] subtype.
   ///
-  /// A raw, already-decoded binary string (a sequence of `0`/`1` characters)
-  /// is also accepted directly.
-  ///
   /// Set [enableDebugging] to `true` for verbose logging output during
   /// development. Defaults to `false`.
   ///
@@ -42,8 +37,10 @@ abstract class AISMessage {
   ///
   /// Throws [UnsupportedMessageTypeException] if [input] specifies a
   /// message type this package does not support.
+  ///
   /// Throws [InvalidBinaryDataException] if [input] is empty or too short
   /// to be a valid AIS message.
+  ///
   /// Throws [UnsupportedMessageTypeExceptionLegacy] if [input] specifies a
   /// message type the legacy version of this package does not support (try setting legacy to false in this case).
   factory AISMessage.fromString(String input, {bool enableDebugging = false, bool legacy = false}) =>

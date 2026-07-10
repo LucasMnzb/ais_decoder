@@ -3,21 +3,64 @@ import '../../utils/binary_conversion.dart';
 import '../../utils/coordinate_utils.dart';
 import '../../utils/getInt.dart';
 
+/// ITU-R M.1371 Message Type 11 — UTC/Date Response.
+///
+/// Sent by a base station in direct reply to a [UtcDateInquiry] (Type 10).
+/// The layout and field semantics are identical to [BaseStationReport]
+/// (Type 4); the only difference is the message type number, which signals
+/// that this is a solicited response rather than an autonomous broadcast.
+///
+/// Position coordinates are `null` when the encoded value is the standard
+/// "not available" sentinel.
 class UtcDateResponse extends AISMessage {
+  /// UTC year of the fix (e.g. 2024). `0` = not available.
   final int year;
+
+  /// UTC month of the fix (1–12). `0` = not available.
   final int month;
+
+  /// UTC day of the fix (1–31). `0` = not available.
   final int day;
+
+  /// UTC hour of the fix (0–23). `24` = not available.
   final int hour;
+
+  /// UTC minute of the fix (0–59). `60` = not available.
   final int minute;
+
+  /// UTC second of the fix (0–59). `60` = not available.
   final int second;
+
+  /// Position accuracy flag. `1` = high accuracy (< 10 m, DGPS-quality);
+  /// `0` = low accuracy (> 10 m).
   final int accuracy;
+
+  /// Longitude of the responding base station in decimal degrees (positive
+  /// east), or `null` when not available (encoded as 181° × 10⁴).
   final double? longitude;
+
+  /// Latitude of the responding base station in decimal degrees (positive
+  /// north), or `null` when not available (encoded as 91° × 10⁴).
   final double? latitude;
+
+  /// Human-readable Electronic Position-Fixing Device (EPFD) fix type string
+  /// (e.g. "GPS", "GLONASS", "Combined GPS/GLONASS").
   final String epfdFixType;
+
+  /// Reserved spare bits (bits 138–147). Should be zero.
   final int spare;
+
+  /// Receiver Autonomous Integrity Monitoring (RAIM) flag.
+  /// `1` = RAIM in use, `0` = RAIM not in use.
   final int raim;
+
+  /// 19-bit SOTDMA communication state word (bits 149–167), used for TDMA
+  /// slot synchronisation by receiving stations.
   final int sotdmaState;
 
+  /// Creates a [UtcDateResponse] with all fields supplied explicitly.
+  ///
+  /// Prefer [UtcDateResponse.fromEncoded] for decoding a real AIS payload.
   UtcDateResponse({
     required super.messageType,
     required super.mmsi,
@@ -85,6 +128,11 @@ class UtcDateResponse extends AISMessage {
   //endregion
 
 
+  /// Decodes a six-bit-armored AIS payload string into a [UtcDateResponse].
+  ///
+  /// [encoded] must be the payload field of a Type 11 NMEA sentence. The
+  /// string is zero-padded to 168 bits before parsing. The EPFD fix type
+  /// string is resolved via [BinaryConverter].
   factory UtcDateResponse.fromEncoded(String encoded) {
     String binary = encoded.padRight(168, '0');
 

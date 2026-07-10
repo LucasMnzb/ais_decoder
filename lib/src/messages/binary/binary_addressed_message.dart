@@ -3,15 +3,48 @@ import 'package:ais_decoder/ais_decoder.dart';
 import '../../utils/getInt.dart';
 
 // ToDo: Maybe add actual data decoder but this is way out of scope for now
+
+/// ITU-R M.1371 Message Type 6 — Addressed Binary Message.
+///
+/// A point-to-point binary message directed at a single destination vessel or
+/// station identified by [destinationMMSI]. The payload is an application-
+/// specific binary blob identified by a Designated Area Code ([dac]) and
+/// Function Identifier ([fid]) pair, which together form the IMO application
+/// identifier.
+///
+/// The raw [data] bytes are provided as-is; interpreting their content
+/// requires knowledge of the specific DAC/FID application standard.
 class BinaryAddressedMessage extends AISMessage {
+  /// Message sequence number (0–3), used to match this message with its
+  /// acknowledgement in a [BinaryAcknowledge] (Type 7) response.
   final int sequenceNumber;
+
+  /// MMSI of the intended recipient of this message.
   final int destinationMMSI;
+
+  /// Retransmit flag. `1` indicates the message is being retransmitted,
+  /// `0` means this is the original transmission.
   final int retransmit;
+
+  /// Reserved spare bit (bit 71). Should be zero.
   final int spare;
+
+  /// Designated Area Code (DAC) — the 10-bit country or organization code
+  /// that, combined with [fid], identifies the application standard governing
+  /// [data].
   final int dac;
+
+  /// Function Identifier (FID) — the 6-bit function code within the [dac]
+  /// namespace that describes how to interpret [data].
   final int fid;
+
+  /// Raw application-specific payload bytes. Decode according to the
+  /// application standard identified by [dac] and [fid].
   final Uint8List data;
 
+  /// Creates a [BinaryAddressedMessage] with all fields supplied explicitly.
+  ///
+  /// Prefer [BinaryAddressedMessage.fromEncoded] for decoding a real AIS payload.
   BinaryAddressedMessage({
     required super.messageType,
     required super.mmsi,
@@ -60,6 +93,12 @@ class BinaryAddressedMessage extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Sequence: $sequenceNumber, Destination: $destinationMMSI, Retransmit: $retransmit, Spare: $spare, DAC: $dac, FID: $fid, Data: $data)';
   //endregion
 
+  /// Decodes a six-bit-armored AIS payload string into a
+  /// [BinaryAddressedMessage].
+  ///
+  /// [encoded] must be the payload field of a Type 6 NMEA sentence. The string
+  /// is zero-padded to 1008 bits before parsing to accommodate the maximum
+  /// allowed payload length.
   factory BinaryAddressedMessage.fromEncoded(String encoded) {
     String binary = encoded.padRight(1008, '0'); // ToDo: This is kind of inefficient - might have to change to an dynamic approach
 

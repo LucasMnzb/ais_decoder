@@ -3,27 +3,94 @@ import 'package:ais_decoder/src/utils/getInt.dart';
 import '../../../ais_decoder.dart';
 import '../../utils/binary_conversion.dart';
 
+/// ITU-R M.1371 Message Type 5 — Static and Voyage Related Data.
+///
+/// Transmitted by Class A transponders to broadcast vessel identity and
+/// voyage-specific information. Because this message spans 424 bits it always
+/// requires two TDMA slots and is therefore sent as a multi-part NMEA
+/// sentence.
+///
+/// Unlike position reports, Type 5 is transmitted infrequently (typically
+/// every 6 minutes) and carries data that changes slowly or per-voyage:
+/// call sign, vessel name, dimensions, EPFD type, estimated time of arrival,
+/// maximum draught, and destination.
+///
+/// > **Note:** The [vesselName], [destination], and dimension fields depend on
+/// > manual data entry and may not always be accurate.
 class StaticAndVoyageRelatedData extends AISMessage {
+  /// AIS equipment version (0–3). `0` = ITU-R M.1371-1, `1` = ITU-R
+  /// M.1371-3, `2` = ITU-R M.1371-5. Values 3 and above are reserved.
   final int aisVersion;
+
+  /// IMO ship identification number (1–999 999 999), or `0` when not
+  /// available. The IMO number remains unchanged for the life of the vessel.
   final int imoNumber;
+
+  /// Vessel radio call sign, up to 7 characters, decoded from the 6-bit ASCII
+  /// character set (bits 70–111).
   final String callSign;
+
+  /// Vessel name, up to 20 characters, decoded from the 6-bit ASCII character
+  /// set (bits 112–231).
   final String vesselName;
+
+  /// Raw integer encoding of the ship and cargo type (0–255).
+  ///
+  /// See [vesselType] for the human-readable description.
   final int vesselTypeInt;
+
+  /// Human-readable description of [vesselTypeInt] (e.g. "Tanker",
+  /// "Cargo vessel").
   final String vesselType;
+
+  /// Distance in metres from the AIS antenna reference point to the bow.
   final int dimensionBow;
+
+  /// Distance in metres from the AIS antenna reference point to the stern.
   final int dimensionStern;
+
+  /// Distance in metres from the AIS antenna reference point to the port side.
   final int dimensionPort;
+
+  /// Distance in metres from the AIS antenna reference point to the starboard
+  /// side.
   final int dimensionStarboard;
+
+  /// Human-readable Electronic Position-Fixing Device (EPFD) fix type string
+  /// (e.g. "GPS", "GLONASS", "Combined GPS/GLONASS").
   final String epfdFixType;
+
+  /// Estimated month of arrival at destination (1–12). `0` = not available.
   final int etaMonth;
+
+  /// Estimated day of arrival at destination (1–31). `0` = not available.
   final int etaDay;
+
+  /// Estimated hour of arrival at destination (0–23). `24` = not available.
   final int etaHour;
+
+  /// Estimated minute of arrival at destination (0–59). `60` = not available.
   final int etaMinute;
+
+  /// Maximum present static draught in metres (0.0–25.5). Resolution is
+  /// 0.1 m. `0.0` = not available.
   final double draught;
+
+  /// Destination port name, up to 20 characters, decoded from the 6-bit ASCII
+  /// character set (bits 302–421).
   final String destination;
+
+  /// Data Terminal Equipment (DTE) readiness flag.
+  /// `0` = DTE available (ready), `1` = DTE not available (default).
   final int dte;
+
+  /// Reserved spare bit (bit 423). Should be zero.
   final int spare;
 
+  /// Creates a [StaticAndVoyageRelatedData] with all fields supplied explicitly.
+  ///
+  /// Prefer [StaticAndVoyageRelatedData.fromEncoded] for decoding a real AIS
+  /// payload.
   StaticAndVoyageRelatedData({
     required super.messageType,
     required super.mmsi,
@@ -115,6 +182,12 @@ class StaticAndVoyageRelatedData extends AISMessage {
   
   //endregion
 
+  /// Decodes a pre-converted binary string into a [StaticAndVoyageRelatedData].
+  ///
+  /// **Deprecated.** Use [StaticAndVoyageRelatedData.fromEncoded] instead.
+  /// This factory operates on a fully expanded binary string (one character
+  /// per bit) which is significantly slower than the direct bit-extraction
+  /// path used by [fromEncoded].
   @Deprecated("Legacy Code use .fromEncoded instead for performance reasons")
   factory StaticAndVoyageRelatedData.fromBinary(String binaryInput) {
     String binary = binaryInput.padRight(424, '0'); // add padding of zeroes if second part got truncated for some f*ck-all reasons...
@@ -186,6 +259,13 @@ class StaticAndVoyageRelatedData extends AISMessage {
     );
   }
 
+  /// Decodes a six-bit-armored AIS payload string into a
+  /// [StaticAndVoyageRelatedData].
+  ///
+  /// [encoded] must be the reassembled payload of a Type 5 multi-part NMEA
+  /// sentence (424 bits total). The string is zero-padded to 424 bits before
+  /// parsing. String fields ([callSign], [vesselName], [vesselType],
+  /// [epfdFixType], [destination]) are resolved via [BinaryConverter].
   factory StaticAndVoyageRelatedData.fromEncoded(String encoded) {
     String binary = encoded.padRight(424, '0'); // add padding of zeroes if second part got truncated for some f*ck-all reasons...
 

@@ -3,17 +3,51 @@ import '../../utils/binary_conversion.dart';
 import '../../utils/coordinate_utils.dart';
 import '../../utils/getInt.dart';
 
+/// ITU-R M.1371 Message Type 27 — Long-Range AIS Broadcast Message.
+///
+/// A compact 96-bit position report designed for satellite AIS reception over
+/// long ranges. To fit within the reduced frame size, coordinates use lower
+/// resolution (1/10-minute rather than 1/10 000-minute) and speed/course are
+/// integer values rather than tenths.
+///
+/// Unlike Class A reports ([PositionMessage]), this message does not carry
+/// rate of turn, heading, timestamp, or maneuver indicator.
 class LongRangeAISBroadcastMessage extends AISMessage {
+  /// Receiver Autonomous Integrity Monitoring (RAIM) flag.
+  /// `1` = RAIM in use, `0` = RAIM not in use.
   final int raimEnabled;
+
+  /// Human-readable navigation status string (e.g. "Under way using engine",
+  /// "At anchor"). Falls back to the raw numeric string if the value is
+  /// undefined.
   final String navigationStatus;
+
+  /// Longitude in decimal degrees (positive east), or `null` when not
+  /// available (encoded as 0x1A838 per ITU-R M.1371).
   final double? longitude;
+
+  /// Latitude in decimal degrees (positive north), or `null` when not
+  /// available.
   final double? latitude;
+
+  /// Speed Over Ground in knots (integer, 0–63). Resolution is 1 knot.
   final double speedOverGround;
+
+  /// Course Over Ground in degrees (integer, 0–359). Resolution is 1 degree.
   final double courseOverGround;
+
+  /// GNSS position status flag. `0` = current GNSS position; `1` = not
+  /// current GNSS position (position estimated from dead reckoning).
   final int gnssPositionStatus;
+
+  /// Reserved spare bit (bit 95). Should be zero.
   final int spare;
 
-
+  /// Creates a [LongRangeAISBroadcastMessage] with all fields supplied
+  /// explicitly.
+  ///
+  /// Prefer [LongRangeAISBroadcastMessage.fromEncoded] for decoding a real
+  /// AIS payload.
   LongRangeAISBroadcastMessage({
     required super.messageType,
     required super.mmsi,
@@ -65,6 +99,13 @@ class LongRangeAISBroadcastMessage extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, RAIM: $raimEnabled, Status: $navigationStatus, Lat: $latitude, Lon: $longitude, SOG: $speedOverGround, COG: $courseOverGround, GNSS: $gnssPositionStatus, Spare: $spare)';
   //endregion
 
+  /// Decodes a pre-converted binary string into a
+  /// [LongRangeAISBroadcastMessage].
+  ///
+  /// **Deprecated.** Use [LongRangeAISBroadcastMessage.fromEncoded] instead.
+  /// This factory operates on a fully expanded binary string (one character
+  /// per bit) which is significantly slower than the direct bit-extraction
+  /// path used by [fromEncoded].
   @Deprecated("Legacy Code use .fromEncoded instead for performance reasons")
   factory LongRangeAISBroadcastMessage.fromBinary(String binary) {
     // common
@@ -108,6 +149,12 @@ class LongRangeAISBroadcastMessage extends AISMessage {
     );
   }
 
+  /// Decodes a six-bit-armored AIS payload string into a
+  /// [LongRangeAISBroadcastMessage].
+  ///
+  /// [encoded] must be the payload field of a Type 27 NMEA sentence. The
+  /// string is zero-padded to 96 bits before parsing. Coordinates use 1/10-
+  /// minute resolution (18-bit signed longitude, 17-bit signed latitude).
   factory LongRangeAISBroadcastMessage.fromEncoded(String encoded) {
     String binary = encoded.padRight(96, '0');
 

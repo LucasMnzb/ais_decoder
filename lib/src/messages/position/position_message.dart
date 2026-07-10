@@ -3,18 +3,62 @@ import '../../utils/binary_conversion.dart';
 import '../../utils/coordinate_utils.dart';
 import '../../utils/getInt.dart';
 
+/// ITU-R M.1371 Message Types 1, 2, and 3 — Class A Position Report.
+///
+/// The most common AIS message, transmitted by Class A transponders
+/// (mandatory on SOLAS vessels). Types 1–3 share an identical field layout;
+/// the type number only differs by the TDMA access scheme used (scheduled,
+/// assigned, or special).
+///
+/// Position coordinates are `null` when the encoded value is the standard
+/// "not available" sentinel. The same applies to [speedOverGround],
+/// [courseOverGround], and [heading].
 class PositionMessage extends AISMessage {
+  /// Human-readable navigation status string (e.g. "Under way using engine",
+  /// "At anchor"). Empty string if the raw value has no defined description.
   final String navigationStatus;
+
+  /// Latitude in decimal degrees (positive north), or `null` when not
+  /// available (encoded as 91° × 10⁴).
   final double? latitude;
+
+  /// Longitude in decimal degrees (positive east), or `null` when not
+  /// available (encoded as 181° × 10⁴).
   final double? longitude;
+
+  /// Speed Over Ground in knots (0.0–102.2), or `null` when not available
+  /// (encoded value ≥ 1023).
   final double? speedOverGround;
+
+  /// Course Over Ground in degrees (0.0–359.9), or `null` when not available
+  /// (encoded value ≥ 3600).
   final double? courseOverGround;
+
+  /// Human-readable maneuver indicator string (e.g. "No special maneuver",
+  /// "Special maneuver"). Empty string if the raw value is undefined.
   final String maneuverIndicator;
+
+  /// Rate of Turn in degrees per minute. Positive = turning right,
+  /// negative = turning left. Special sentinel values (−128.0, 0.0, 127.0)
+  /// indicate no turn information or maximum turn rate.
   final double rateOfTurn;
+
+  /// True heading in degrees (0–359), or `null` when not available
+  /// (encoded value = 511).
   final double? heading;
+
+  /// UTC second at which the position fix was taken (0–59). Values 60–63
+  /// carry special meaning (e.g. 61 = manual input, 63 = positioning system
+  /// inoperative).
   final int timestamp;
+
+  /// Receiver Autonomous Integrity Monitoring (RAIM) flag.
+  /// `1` = RAIM in use, `0` = RAIM not in use.
   final int raimEnabled;
 
+  /// Creates a [PositionMessage] with all fields supplied explicitly.
+  ///
+  /// Prefer [PositionMessage.fromEncoded] for decoding a real AIS payload.
   PositionMessage({
     required super.messageType,
     required super.mmsi,
@@ -62,6 +106,12 @@ class PositionMessage extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Status: $navigationStatus, Lat: $latitude, Lon: $longitude, SOG: $speedOverGround, COG: $courseOverGround, Maneuver: $maneuverIndicator, ROT: $rateOfTurn, Heading: $heading, Timestamp: $timestamp, RAIM: $raimEnabled)';
   //endregion
 
+  /// Decodes a pre-converted binary string into a [PositionMessage].
+  ///
+  /// **Deprecated.** Use [PositionMessage.fromEncoded] instead. This factory
+  /// operates on a fully expanded binary string (one character per bit) which
+  /// is significantly slower than the direct bit-extraction path used by
+  /// [fromEncoded].
   @Deprecated("Legacy Code use .fromEncoded instead for performance reasons")
   factory PositionMessage.fromBinary(String binary) {
     // common
@@ -113,6 +163,12 @@ class PositionMessage extends AISMessage {
     );
   }
 
+  /// Decodes a six-bit-armored AIS payload string into a [PositionMessage].
+  ///
+  /// [encoded] must be the payload field of a Type 1, 2, or 3 NMEA sentence.
+  /// Bit extraction is performed directly on the encoded characters without
+  /// first expanding to a binary string, making this significantly faster than
+  /// the deprecated [PositionMessage.fromBinary].
   factory PositionMessage.fromEncoded(String encoded) {
     int messageType = getUintDirect(encoded, 0, 6);
     int repeatIndicator = getUintDirect(encoded, 6, 8);

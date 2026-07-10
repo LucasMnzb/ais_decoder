@@ -3,24 +3,80 @@ import 'package:ais_decoder/src/utils/binary_conversion.dart';
 import 'package:ais_decoder/src/utils/coordinate_utils.dart';
 import '../../utils/getInt.dart';
 
+/// ITU-R M.1371 Message Type 22 — Channel Management.
+///
+/// Broadcast by a base station to configure VHF channel usage and transmit
+/// parameters for mobile stations within a region or for specific stations.
+///
+/// The message targets either a geographic zone or a pair of addressed
+/// stations, depending on [addressed]:
+/// - When [addressed] is `0` (broadcast), [neLongitude], [neLatitude],
+///   [swLongitude], and [swLatitude] define the bounding box of the managed
+///   area, and [mmsi1]/[mmsi2] are `null`.
+/// - When [addressed] is `1`, [mmsi1] and [mmsi2] identify the specific
+///   stations being configured, and the geographic fields are `null`.
 class ChannelManagementMessage extends AISMessage {
+  /// Reserved spare bits (bits 38–39). Should be zero.
   final int spare;
+
+  /// ITU channel number for VHF channel A (0–4095).
   final int channelA;
+
+  /// ITU channel number for VHF channel B (0–4095).
   final int channelB;
+
+  /// Raw integer encoding of the transmit/receive mode (0–15).
+  ///
+  /// See [txrxMode] for the human-readable description.
   final int txrxModeInt;
+
+  /// Human-readable description of [txrxModeInt], or `null` if the value has
+  /// no defined description.
   final String? txrxMode;
+
+  /// Transmit power setting. `0` = high power, `1` = low power.
   final int power;
+
+  /// Longitude of the north-east corner of the managed geographic area in
+  /// decimal degrees (positive east), or `null` when [addressed] is `1`.
   final double? neLongitude;
+
+  /// Latitude of the north-east corner of the managed geographic area in
+  /// decimal degrees (positive north), or `null` when [addressed] is `1`.
   final double? neLatitude;
+
+  /// Longitude of the south-west corner of the managed geographic area in
+  /// decimal degrees (positive east), or `null` when [addressed] is `1`.
   final double? swLongitude;
+
+  /// Latitude of the south-west corner of the managed geographic area in
+  /// decimal degrees (positive north), or `null` when [addressed] is `1`.
   final double? swLatitude;
+
+  /// MMSI of the first addressed station, or `null` when [addressed] is `0`
+  /// (broadcast / geographic zone).
   final int? mmsi1;
+
+  /// MMSI of the second addressed station, or `null` when [addressed] is `0`.
   final int? mmsi2;
+
+  /// Addressed flag. `1` means [mmsi1]/[mmsi2] are used; `0` means the
+  /// geographic bounding box fields are used.
   final int addressed;
+
+  /// Channel A bandwidth flag. `0` = default (25 kHz); `1` = 12.5 kHz.
   final int bandA;
+
+  /// Channel B bandwidth flag. `0` = default (25 kHz); `1` = 12.5 kHz.
   final int bandB;
+
+  /// Transitional zone size in nautical miles (1–8). Defines how far outside
+  /// the area boundary the channel change takes effect.
   final int zoneSize;
 
+  /// Creates a [ChannelManagementMessage] with all fields supplied explicitly.
+  ///
+  /// Prefer [ChannelManagementMessage.fromEncoded] for decoding a real AIS payload.
   ChannelManagementMessage({
     required super.messageType,
     required super.mmsi,
@@ -94,6 +150,13 @@ class ChannelManagementMessage extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Spare: $spare, ChannelA: $channelA, ChannelB: $channelB, TxRxMode: $txrxMode, Power: $power, NeLongitude: $neLongitude, NeLatitude: $neLatitude, SwLongitude: $swLongitude, SwLatitude: $swLatitude, MMSI1: $mmsi1, MMSI2: $mmsi2, Addressed: $addressed, BandA: $bandA, BandB: $bandB, ZoneSize: $zoneSize)';
   //endregion  
 
+  /// Decodes a six-bit-armored AIS payload string into a
+  /// [ChannelManagementMessage].
+  ///
+  /// [encoded] must be the payload field of a Type 22 NMEA sentence. The
+  /// string is zero-padded to 168 bits before parsing. The [addressed] flag
+  /// (bit 139) is read first to determine whether to parse the geographic
+  /// bounding box or the two station MMSIs from bits 69–134.
   factory ChannelManagementMessage.fromEncoded(String encoded) {
     String binary = encoded.padRight(168, '0');
 

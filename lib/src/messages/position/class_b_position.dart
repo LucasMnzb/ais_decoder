@@ -2,17 +2,52 @@ import '../../../ais_decoder.dart';
 import '../../utils/coordinate_utils.dart';
 import '../../utils/getInt.dart';
 
+/// ITU-R M.1371 Message Type 18 — Standard Class B CS Position Report.
+///
+/// Transmitted by Class B (non-SOLAS) transponders using Carrier Sense (CS)
+/// TDMA. Compared to [PositionMessage] (Types 1–3), this report omits
+/// navigation status, rate of turn, and maneuver indicator, and carries a
+/// position accuracy flag in their place.
+///
+/// Position coordinates and motion fields are `null` when the encoded value
+/// is the standard "not available" sentinel.
 class StandardClassBCSPositionReport extends AISMessage {
-
+  /// Latitude in decimal degrees (positive north), or `null` when not
+  /// available (encoded as 91° × 10⁴).
   final double? latitude;
+
+  /// Longitude in decimal degrees (positive east), or `null` when not
+  /// available (encoded as 181° × 10⁴).
   final double? longitude;
+
+  /// Speed Over Ground in knots (0.0–102.2), or `null` when not available
+  /// (encoded value ≥ 1023).
   final double? speedOverGround;
+
+  /// Course Over Ground in degrees (0.0–359.9), or `null` when not available
+  /// (encoded value ≥ 3600).
   final double? courseOverGround;
+
+  /// True heading in degrees (0–359), or `null` when not available
+  /// (encoded value = 511).
   final double? heading;
+
+  /// UTC second at which the position fix was taken (0–59). Values 60–63
+  /// carry special meaning (e.g. 61 = manual input, 63 = positioning system
+  /// inoperative).
   final int timestamp;
+
+  /// Position accuracy flag. `1` = high accuracy (< 10 m, DGPS-quality);
+  /// `0` = low accuracy (> 10 m).
   final int positionAccuracy;
+
+  /// Receiver Autonomous Integrity Monitoring (RAIM) flag.
+  /// `1` = RAIM in use, `0` = RAIM not in use.
   final int raimFlag;
 
+  /// Creates a [StandardClassBCSPositionReport] with all fields supplied explicitly.
+  ///
+  /// Prefer [StandardClassBCSPositionReport.fromEncoded] for decoding a real AIS payload.
   StandardClassBCSPositionReport({
     required super.messageType,
     required super.mmsi,
@@ -64,6 +99,13 @@ class StandardClassBCSPositionReport extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Heading: $heading, Accuracy: $positionAccuracy, Lat: $latitude, Lon: $longitude, COG: $courseOverGround, RAIM: $raimFlag, SOG: $speedOverGround, Timestamp: $timestamp)';
   //endregion
 
+  /// Decodes a pre-converted binary string into a
+  /// [StandardClassBCSPositionReport].
+  ///
+  /// **Deprecated.** Use [StandardClassBCSPositionReport.fromEncoded] instead.
+  /// This factory operates on a fully expanded binary string (one character
+  /// per bit) which is significantly slower than the direct bit-extraction
+  /// path used by [fromEncoded].
   @Deprecated("Legacy Code use .fromEncoded instead for performance reasons")
   factory StandardClassBCSPositionReport.fromBinary(String binary) {
     // common
@@ -110,6 +152,14 @@ class StandardClassBCSPositionReport extends AISMessage {
   }
 
   //ToDo (medium priority): Needs to be actually finished for full 100% completion - currently most important values
+
+  /// Decodes a six-bit-armored AIS payload string into a
+  /// [StandardClassBCSPositionReport].
+  ///
+  /// [encoded] must be the payload field of a Type 18 NMEA sentence. The
+  /// string is zero-padded to 168 bits before parsing. Some Class B-specific
+  /// flag fields (e.g. CS/display/DSC/band flags) are not yet extracted —
+  /// see the inline TODO.
   factory StandardClassBCSPositionReport.fromEncoded(String encoded) {
     String binary = encoded.padRight(168, '0');
 

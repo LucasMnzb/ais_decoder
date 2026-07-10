@@ -3,21 +3,64 @@ import '../../utils/binary_conversion.dart';
 import '../../utils/coordinate_utils.dart';
 import '../../utils/getInt.dart';
 
+/// ITU-R M.1371 Message Type 4 — Base Station Report.
+///
+/// Broadcast by a fixed base station to distribute UTC time and date, and to
+/// report the station's own position. Receivers use this message to
+/// synchronise their TDMA timing. Also serves as Message Type 11
+/// (UTC/Date Response) when sent in reply to a UTC/Date Inquiry (Type 10).
+///
+/// The position coordinates are `null` when the encoded value is the standard
+/// "not available" sentinel.
 class BaseStationReport extends AISMessage {
+  /// UTC year of the position fix (e.g. 2024). `0` = not available.
   final int year;
+
+  /// UTC month of the position fix (1–12). `0` = not available.
   final int month;
+
+  /// UTC day of the position fix (1–31). `0` = not available.
   final int day;
+
+  /// UTC hour of the position fix (0–23). `24` = not available.
   final int hour;
+
+  /// UTC minute of the position fix (0–59). `60` = not available.
   final int minute;
+
+  /// UTC second of the position fix (0–59). `60` = not available.
   final int second;
+
+  /// Position accuracy flag. `1` = high accuracy (< 10 m, DGPS-quality);
+  /// `0` = low accuracy (> 10 m).
   final int accuracy;
+
+  /// Longitude of the base station in decimal degrees (positive east), or
+  /// `null` when not available (encoded as 181° × 10⁴).
   final double? longitude;
+
+  /// Latitude of the base station in decimal degrees (positive north), or
+  /// `null` when not available (encoded as 91° × 10⁴).
   final double? latitude;
+
+  /// Human-readable Electronic Position-Fixing Device (EPFD) fix type string
+  /// (e.g. "GPS", "GLONASS", "Combined GPS/GLONASS").
   final String epfdFixType;
+
+  /// Reserved spare bits (bits 138–147). Should be zero.
   final int spare;
+
+  /// Receiver Autonomous Integrity Monitoring (RAIM) flag.
+  /// `1` = RAIM in use, `0` = RAIM not in use.
   final int raim;
+
+  /// 19-bit SOTDMA communication state word (bits 149–167), used for TDMA
+  /// slot synchronisation by receiving stations.
   final int sotdmaState;
 
+  /// Creates a [BaseStationReport] with all fields supplied explicitly.
+  ///
+  /// Prefer [BaseStationReport.fromEncoded] for decoding a real AIS payload.
   BaseStationReport({
     required super.messageType,
     required super.mmsi,
@@ -84,6 +127,12 @@ class BaseStationReport extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Year: $year, Month: $month, Day: $day, Hour: $hour, Minute: $minute, Second: $second, Accuracy: $accuracy, Lat: $latitude, Lon: $longitude, EPFD: $epfdFixType, RAIM: $raim, SOTDMA: $sotdmaState)';
   //endregion
 
+  /// Decodes a pre-converted binary string into a [BaseStationReport].
+  ///
+  /// **Deprecated.** Use [BaseStationReport.fromEncoded] instead. This factory
+  /// operates on a fully expanded binary string (one character per bit) which
+  /// is significantly slower than the direct bit-extraction path used by
+  /// [fromEncoded].
   @Deprecated("Legacy Code use .fromEncoded instead for performance reasons")
   factory BaseStationReport.fromBinary(String binary) {
     // common
@@ -141,6 +190,11 @@ class BaseStationReport extends AISMessage {
     );
   }
 
+  /// Decodes a six-bit-armored AIS payload string into a [BaseStationReport].
+  ///
+  /// [encoded] must be the payload field of a Type 4 (or Type 11) NMEA
+  /// sentence. The string is zero-padded to 168 bits before parsing. The EPFD
+  /// fix type string is resolved via [BinaryConverter].
   factory BaseStationReport.fromEncoded(String encoded) {
     String binary = encoded.padRight(168, '0');
 

@@ -3,11 +3,31 @@ import 'package:ais_decoder/src/utils/getInt.dart';
 import '../../../ais_decoder.dart';
 import '../../utils/binary_conversion.dart';
 
+/// ITU-R M.1371 Message Type 24, Part A — Static Data Report (Name).
+///
+/// Class B transponders transmit static vessel data split across two separate
+/// messages: Part A (this class) carries only the vessel name, and
+/// [StaticDataReportB] carries the remaining static fields. The [partNumber]
+/// field distinguishes the two parts (`0` = Part A, `1` = Part B).
+///
+/// > **Note:** In practice, Part A frames are sometimes transmitted as only
+/// > 160 bits instead of the standard 168 bits, omitting the trailing spare
+/// > field. Both factories zero-pad to 168 bits to handle this gracefully.
 class StaticDataReportA extends AISMessage {
+  /// Part number identifier. Always `0` for this class.
   final int partNumber;
+
+  /// Vessel name, up to 20 characters, decoded from the 6-bit ASCII character
+  /// set defined by ITU-R M.1371 (bits 40–159).
   final String vesselName;
+
+  /// Reserved spare bits (bits 160–167). Should be zero, but may be absent in
+  /// some real-world transmissions (see class note).
   final int spare;
 
+  /// Creates a [StaticDataReportA] with all fields supplied explicitly.
+  ///
+  /// Prefer [StaticDataReportA.fromEncoded] for decoding a real AIS payload.
   StaticDataReportA({
     required super.messageType,
     required super.mmsi,
@@ -47,6 +67,11 @@ class StaticDataReportA extends AISMessage {
           'spare: $spare, Hint: This is Part/Type A of the Type 24 AIS Message, expect Part/Type B)';
   //endregion
 
+  /// Decodes a pre-converted binary string into a [StaticDataReportA].
+  ///
+  /// Prefer [StaticDataReportA.fromEncoded] for new code. The string is
+  /// zero-padded to 168 bits before parsing to tolerate the common real-world
+  /// case where Part A is transmitted as only 160 bits.
   factory StaticDataReportA.fromBinary(String binaryInput) {
     String binary = binaryInput.padRight(168, '0'); // add padding of zeroes if type a part got truncated for some f*ck-all reasons - // "According to the standard, both the A and B parts are supposed to be 168 bits. However, in the wild, A parts are often transmitted with only 160 bits, omitting the 'spare' 7 bits at the end. Implementers should be permissive about this."
 
@@ -76,6 +101,11 @@ class StaticDataReportA extends AISMessage {
     );
   }
 
+  /// Decodes a six-bit-armored AIS payload string into a [StaticDataReportA].
+  ///
+  /// [encoded] must be the payload field of a Type 24 Part A NMEA sentence.
+  /// The string is zero-padded to 168 bits before parsing to tolerate the
+  /// common real-world case where Part A is transmitted as only 160 bits.
   factory StaticDataReportA.fromEncoded(String encoded) {
     String binary = encoded.padRight(168, '0'); // add padding of zeroes if type a part got truncated for some f*ck-all reasons - // "According to the standard, both the A and B parts are supposed to be 168 bits. However, in the wild, A parts are often transmitted with only 160 bits, omitting the 'spare' 7 bits at the end. Implementers should be permissive about this."
 
@@ -100,21 +130,66 @@ class StaticDataReportA extends AISMessage {
   }
 }
 
+/// ITU-R M.1371 Message Type 24, Part B — Static Data Report (Equipment).
+///
+/// The second part of the Class B static data report, complementing
+/// [StaticDataReportA]. Part B carries the ship and cargo type, transponder
+/// vendor information, call sign, physical dimensions, and — for vessels
+/// operating under a mothership — the mothership MMSI.
+///
+/// [partNumber] is always `1` for Part B. Pair this message with the
+/// corresponding [StaticDataReportA] (same [mmsi]) to get the complete
+/// static picture for a Class B vessel.
 class StaticDataReportB extends AISMessage {
+  /// Part number identifier. Always `1` for this class.
   final int partNumber;
+
+  /// Raw integer encoding of the ship and cargo type (0–255).
+  ///
+  /// See [vesselType] for the human-readable description.
   final int vesselTypeInt;
+
+  /// Human-readable description of [vesselTypeInt] (e.g. "Tanker",
+  /// "Cargo vessel").
   final String vesselType;
+
+  /// Transponder vendor identifier string, decoded from bits 48–65 (3
+  /// characters of 6-bit ASCII).
   final String vendorId;
+
+  /// Transponder unit model code (0–15), assigned by the manufacturer.
   final int unitModel;
+
+  /// Transponder serial number (0–1 048 575), assigned by the manufacturer.
   final int serialNumber;
+
+  /// Vessel radio call sign, up to 7 characters, decoded from the 6-bit ASCII
+  /// character set (bits 90–131).
   final String callSign;
+
+  /// Distance in metres from the AIS antenna reference point to the bow.
   final int dimensionBow;
+
+  /// Distance in metres from the AIS antenna reference point to the stern.
   final int dimensionStern;
+
+  /// Distance in metres from the AIS antenna reference point to the port side.
   final int dimensionPort;
+
+  /// Distance in metres from the AIS antenna reference point to the starboard
+  /// side.
   final int dimensionStarboard;
+
+  /// MMSI of the mothership when this vessel operates as a tender or auxiliary
+  /// craft. `0` when not applicable.
   final int mothershipMMSI;
+
+  /// Reserved spare bits (bits 162–167). Should be zero.
   final int spare;
 
+  /// Creates a [StaticDataReportB] with all fields supplied explicitly.
+  ///
+  /// Prefer [StaticDataReportB.fromEncoded] for decoding a real AIS payload.
   StaticDataReportB({
     required super.messageType,
     required super.mmsi,
@@ -187,6 +262,10 @@ class StaticDataReportB extends AISMessage {
           'Serial Number: $serialNumber, spare: $spare)';
   //endregion
 
+  /// Decodes a pre-converted binary string into a [StaticDataReportB].
+  ///
+  /// Prefer [StaticDataReportB.fromEncoded] for new code. The string is
+  /// zero-padded to 168 bits before parsing to tolerate truncated frames.
   factory StaticDataReportB.fromBinary(String binaryInput) {
     String binary = binaryInput.padRight(168, '0'); // add padding of zeroes if second part got truncated for some f*ck-all reasons...
 
@@ -243,6 +322,11 @@ class StaticDataReportB extends AISMessage {
     );
   }
 
+  /// Decodes a six-bit-armored AIS payload string into a [StaticDataReportB].
+  ///
+  /// [encoded] must be the payload field of a Type 24 Part B NMEA sentence.
+  /// The string is zero-padded to 168 bits before parsing. String fields
+  /// ([vesselType], [vendorId], [callSign]) are resolved via [BinaryConverter].
   factory StaticDataReportB.fromEncoded(String encoded) {
     String binary = encoded.padRight(168, '0'); // add padding of zeroes if second part got truncated.
 

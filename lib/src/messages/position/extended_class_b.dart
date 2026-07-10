@@ -4,32 +4,101 @@ import '../../utils/coordinate_utils.dart';
 import '../../utils/getInt.dart';
 
 
-/// ## Extended Class B CS Position Report
+/// ITU-R M.1371 Message Type 19 — Extended Class B CS Position Report.
 ///
-/// Note: The information in the ship name and dimension fields is not reliable, as it has to be hand-entered by humans rather than gathered automatically from sensors.
+/// An extended version of [StandardClassBCSPositionReport] (Type 18) that
+/// appends static vessel data: name, ship/cargo type, physical dimensions,
+/// EPFD fix type, DTE readiness, and assigned mode flag.
+///
+/// > **Note:** The [vesselName] and dimension fields rely on manual data
+/// > entry by the crew rather than automated sensors, so their accuracy
+/// > cannot be guaranteed.
+///
+/// Position coordinates and motion fields are `null` when the encoded value
+/// is the standard "not available" sentinel.
 class ExtendedClassBCSPositionReport extends AISMessage {
-
+  /// Speed Over Ground in knots (0.0–102.2), or `null` when not available
+  /// (encoded value ≥ 1023).
   final double? speedOverGround;
+
+  /// Position accuracy flag. `1` = high accuracy (< 10 m, DGPS-quality);
+  /// `0` = low accuracy (> 10 m).
   final int positionAccuracy;
+
+  /// Longitude in decimal degrees (positive east), or `null` when not
+  /// available (encoded as 181° × 10⁴).
   final double? longitude;
+
+  /// Latitude in decimal degrees (positive north), or `null` when not
+  /// available (encoded as 91° × 10⁴).
   final double? latitude;
+
+  /// Course Over Ground in degrees (0.0–359.9), or `null` when not available
+  /// (encoded value ≥ 3600).
   final double? courseOverGround;
+
+  /// True heading in degrees (0–359), or `null` when not available
+  /// (encoded value = 511).
   final double? heading;
+
+  /// UTC second at which the position fix was taken (0–59). Values 60–63
+  /// carry special meaning (e.g. 61 = manual input, 63 = inoperative).
   final int timestamp;
+
+  /// Regional reserved field (bits 139–142). Interpretation is region-specific
+  /// and is stored as a raw numeric value without further decoding.
   final double regionalReserved;
+
+  /// Vessel name, up to 20 characters, decoded from the 6-bit ASCII encoding
+  /// used in AIS (bits 143–262).
   final String vesselName;
+
+  /// Raw integer encoding of the ship and cargo type (0–255).
+  ///
+  /// See [vesselType] for the human-readable description.
   final int vesselTypeInt;
+
+  /// Human-readable description of [vesselTypeInt] (e.g. "Tanker",
+  /// "Cargo vessel").
   final String vesselType;
+
+  /// Distance in metres from the AIS antenna reference point to the bow.
   final int dimensionBow;
+
+  /// Distance in metres from the AIS antenna reference point to the stern.
   final int dimensionStern;
+
+  /// Distance in metres from the AIS antenna reference point to the port side.
   final int dimensionPort;
+
+  /// Distance in metres from the AIS antenna reference point to the starboard
+  /// side.
   final int dimensionStarboard;
+
+  /// Human-readable Electronic Position-Fixing Device (EPFD) fix type string
+  /// (e.g. "GPS", "GLONASS", "Combined GPS/GLONASS").
   final String epfdFixType;
+
+  /// Receiver Autonomous Integrity Monitoring (RAIM) flag.
+  /// `1` = RAIM in use, `0` = RAIM not in use.
   final int raimFlag;
+
+  /// Data Terminal Equipment (DTE) readiness flag.
+  /// `0` = DTE available (ready), `1` = DTE not available (default).
   final int dte;
+
+  /// Assigned mode flag. `0` = autonomous mode; `1` = assigned mode (slot
+  /// schedule commanded by a base station). See IALA for details.
   final int assignedMode;
+
+  /// Reserved spare bits (bits 308–311). Should be zero.
   final int spare;
 
+  /// Creates an [ExtendedClassBCSPositionReport] with all fields supplied
+  /// explicitly.
+  ///
+  /// Prefer [ExtendedClassBCSPositionReport.fromEncoded] for decoding a real
+  /// AIS payload.
   ExtendedClassBCSPositionReport({
     required super.messageType,
     required super.mmsi,
@@ -117,6 +186,13 @@ class ExtendedClassBCSPositionReport extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, SOG: $speedOverGround, Accuracy: $positionAccuracy, Lat: $latitude, Lon: $longitude, COG: $courseOverGround, Heading: $heading, Timestamp: $timestamp, Regional: $regionalReserved, Name: $vesselName, VesselType: $vesselType, DimBow: $dimensionBow, DimStern: $dimensionStern, DimPort: $dimensionPort, DimStbd: $dimensionStarboard, EPFD: $epfdFixType, RAIM: $raimFlag, DTE: $dte, Assigned: $assignedMode, Spare: $spare)';
   //endregion
 
+  /// Decodes a pre-converted binary string into an
+  /// [ExtendedClassBCSPositionReport].
+  ///
+  /// **Deprecated.** Use [ExtendedClassBCSPositionReport.fromEncoded] instead.
+  /// This factory operates on a fully expanded binary string (one character
+  /// per bit) which is significantly slower than the direct bit-extraction
+  /// path used by [fromEncoded].
   @Deprecated("Legacy Code use .fromEncoded instead for performance reasons")
   factory ExtendedClassBCSPositionReport.fromBinary(String binary) {
     // common
@@ -195,6 +271,13 @@ class ExtendedClassBCSPositionReport extends AISMessage {
     );
   }
 
+  /// Decodes a six-bit-armored AIS payload string into an
+  /// [ExtendedClassBCSPositionReport].
+  ///
+  /// [encoded] must be the payload field of a Type 19 NMEA sentence. The
+  /// string is zero-padded to 312 bits before parsing. Human-readable string
+  /// fields ([vesselName], [vesselType], [epfdFixType]) are resolved via
+  /// [BinaryConverter].
   factory ExtendedClassBCSPositionReport.fromEncoded(String encoded) {
     String binary = encoded.padRight(312, '0');
 

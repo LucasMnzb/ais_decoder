@@ -1,15 +1,43 @@
 import 'package:ais_decoder/ais_decoder.dart';
 import '../../utils/getInt.dart';
 
+/// ITU-R M.1371 Message Type 16 — Assignment Mode Command.
+///
+/// Transmitted by a base station to assign a specific TDMA slot schedule to
+/// one or two mobile stations, overriding their autonomous reporting behaviour.
+/// The first assignment ([mmsi1], [offset1], [increment1]) is always present.
+/// The second assignment ([mmsi2], [offset2], [increment2]) is optional and
+/// will be `null` when absent.
 class AssignmentModeCommand extends AISMessage {
+  /// Reserved spare bits (bits 38–39). Should be zero.
   final int spare;
+
+  /// MMSI of the first station being assigned a slot schedule.
   final int mmsi1;
+
+  /// TDMA slot offset for the first assigned station (0–4095). Defines the
+  /// first slot within the current frame at which the station should transmit.
   final int offset1;
+
+  /// Slot increment for the first assigned station (0–1023). The number of
+  /// slots between successive transmissions. `0` means one-time assignment.
   final int increment1;
+
+  /// MMSI of the second station being assigned a slot schedule, or `null`
+  /// when only one assignment is present.
   final int? mmsi2;
+
+  /// TDMA slot offset for the second assigned station, or `null` when
+  /// [mmsi2] is absent.
   final int? offset2;
+
+  /// Slot increment for the second assigned station, or `null` when [mmsi2]
+  /// is absent.
   final int? increment2;
 
+  /// Creates an [AssignmentModeCommand] with all fields supplied explicitly.
+  ///
+  /// Prefer [AssignmentModeCommand.fromEncoded] for decoding a real AIS payload.
   AssignmentModeCommand({
     required super.messageType,
     required super.mmsi,
@@ -58,6 +86,13 @@ class AssignmentModeCommand extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Spare: $spare, MMSI1: $mmsi1, Offset1: $offset1, Increment1: $increment1, MMSI2: $mmsi2, Offset2: $offset2, Increment2: $increment2)';
   //endregion  
 
+  /// Decodes a six-bit-armored AIS payload string into an
+  /// [AssignmentModeCommand].
+  ///
+  /// [encoded] must be the payload field of a Type 16 NMEA sentence. The
+  /// string is zero-padded to 144 bits (the maximum two-assignment frame)
+  /// before parsing. The optional second MMSI/offset/increment triple is
+  /// returned as `null` when the underlying bits are all zero.
   factory AssignmentModeCommand.fromEncoded(String encoded) {
     String binary = encoded.padRight(144, '0');
 

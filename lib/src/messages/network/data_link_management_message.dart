@@ -1,25 +1,81 @@
 import 'package:ais_decoder/ais_decoder.dart';
 import '../../utils/getInt.dart';
 
+/// ITU-R M.1371 Message Type 20 — Data Link Management Message.
+///
+/// Sent by a base station to pre-announce TDMA slot reservations for its own
+/// future transmissions, preventing other stations from occupying those slots.
+/// Up to four reservation blocks may be included in a single message.
+///
+/// The first reservation ([offset1], [number1], [timeout1], [increment1]) is
+/// always present. The remaining three blocks are optional and their fields
+/// will be `null` when absent.
 class DataLinkManagementMessage extends AISMessage {
+  /// Reserved spare bits (bits 38–39). Should be zero.
   final int spare;
+
+  /// Starting slot offset for the first reservation (0–4095).
   final int offset1;
+
+  /// Number of consecutive slots reserved in the first block (1–15).
   final int number1;
+
+  /// Number of frames for which the first reservation remains valid (1–7).
+  /// A value of `7` means the reservation is indefinite.
   final int timeout1;
+
+  /// Slot increment between successive reserved blocks for the first
+  /// reservation (0–1023). `0` means a one-time reservation.
   final int increment1;
+
+  /// Starting slot offset for the second reservation, or `null` if absent.
   final int? offset2;
+
+  /// Number of consecutive slots in the second reservation, or `null` if
+  /// [offset2] is absent.
   final int? number2;
+
+  /// Frame timeout for the second reservation, or `null` if [offset2] is
+  /// absent.
   final int? timeout2;
+
+  /// Slot increment for the second reservation, or `null` if [offset2] is
+  /// absent.
   final int? increment2;
+
+  /// Starting slot offset for the third reservation, or `null` if absent.
   final int? offset3;
+
+  /// Number of consecutive slots in the third reservation, or `null` if
+  /// [offset3] is absent.
   final int? number3;
+
+  /// Frame timeout for the third reservation, or `null` if [offset3] is
+  /// absent.
   final int? timeout3;
+
+  /// Slot increment for the third reservation, or `null` if [offset3] is
+  /// absent.
   final int? increment3;
+
+  /// Starting slot offset for the fourth reservation, or `null` if absent.
   final int? offset4;
+
+  /// Number of consecutive slots in the fourth reservation, or `null` if
+  /// [offset4] is absent.
   final int? number4;
+
+  /// Frame timeout for the fourth reservation, or `null` if [offset4] is
+  /// absent.
   final int? timeout4;
+
+  /// Slot increment for the fourth reservation, or `null` if [offset4] is
+  /// absent.
   final int? increment4;
 
+  /// Creates a [DataLinkManagementMessage] with all fields supplied explicitly.
+  ///
+  /// Prefer [DataLinkManagementMessage.fromEncoded] for decoding a real AIS payload.
   DataLinkManagementMessage({
     required super.messageType,
     required super.mmsi,
@@ -98,6 +154,13 @@ class DataLinkManagementMessage extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Spare: $spare, Offset1: $offset1, Number1: $number1, Timeout1: $timeout1, Increment1: $increment1, Offset2: $offset2, Number2: $number2, Timeout2: $timeout2, Increment2: $increment2, Offset3: $offset3, Number3: $number3, Timeout3: $timeout3, Increment3: $increment3, Offset4: $offset4, Number4: $number4, Timeout4: $timeout4, Increment4: $increment4)';
   //endregion  
 
+  /// Decodes a six-bit-armored AIS payload string into a
+  /// [DataLinkManagementMessage].
+  ///
+  /// [encoded] must be the payload field of a Type 20 NMEA sentence. The
+  /// string is zero-padded to 160 bits (the four-reservation maximum) before
+  /// parsing. Optional reservation fields whose bits are all zero are returned
+  /// as `null`.
   factory DataLinkManagementMessage.fromEncoded(String encoded) {
     String binary = encoded.padRight(160, '0');
 

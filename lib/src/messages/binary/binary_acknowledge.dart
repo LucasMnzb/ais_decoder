@@ -1,18 +1,50 @@
 import 'package:ais_decoder/ais_decoder.dart';
 import '../../utils/getInt.dart';
 
+/// ITU-R M.1371 Message Type 7 — Binary Acknowledge.
+///
+/// Sent by a base station or mobile station to acknowledge receipt of one or
+/// more [BinaryAddressedMessage] (Type 6) messages. Up to four source MMSIs
+/// and their corresponding sequence numbers can be acknowledged in a single
+/// transmission.
+///
+/// The first MMSI/sequence pair ([mmsi1] / [mmsiSeq1]) is always present.
+/// The remaining three pairs ([mmsi2]/[mmsiSeq2] through [mmsi4]/[mmsiSeq4])
+/// are optional and will be `null` when absent.
 class BinaryAcknowledge extends AISMessage {
+  /// Reserved spare bits (bits 38–39). Should be zero.
   final int spare;
+
+  /// MMSI of the first station being acknowledged.
   final int mmsi1;
+
+  /// Sequence number of the message being acknowledged for [mmsi1] (0–3).
   final int mmsiSeq1;
+
+  /// MMSI of the second station being acknowledged, or `null` if absent.
   final int? mmsi2;
+
+  /// Sequence number of the message being acknowledged for [mmsi2], or `null`
+  /// if [mmsi2] is absent.
   final int? mmsiSeq2;
+
+  /// MMSI of the third station being acknowledged, or `null` if absent.
   final int? mmsi3;
+
+  /// Sequence number of the message being acknowledged for [mmsi3], or `null`
+  /// if [mmsi3] is absent.
   final int? mmsiSeq3;
+
+  /// MMSI of the fourth station being acknowledged, or `null` if absent.
   final int? mmsi4;
+
+  /// Sequence number of the message being acknowledged for [mmsi4], or `null`
+  /// if [mmsi4] is absent.
   final int? mmsiSeq4;
 
-
+  /// Creates a [BinaryAcknowledge] with all fields supplied explicitly.
+  ///
+  /// Prefer [BinaryAcknowledge.fromEncoded] for decoding a real AIS payload.
   BinaryAcknowledge({
     required super.messageType,
     required super.mmsi,
@@ -67,6 +99,12 @@ class BinaryAcknowledge extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Spare: $spare, MMSI1: $mmsi1, Seq1: $mmsiSeq1, MMSI2: $mmsi2, Seq2: $mmsiSeq2, MMSI3: $mmsi3, Seq3: $mmsiSeq3, MMSI4: $mmsi4, Seq4: $mmsiSeq4)';
   //endregion
 
+  /// Decodes a six-bit-armored AIS payload string into a [BinaryAcknowledge].
+  ///
+  /// [encoded] must be the payload field of a Type 7 NMEA sentence. The string
+  /// is zero-padded to 168 bits (the maximum frame length for four
+  /// acknowledgements) before parsing. Optional MMSI/sequence pairs whose bits
+  /// are all zero are returned as `null`.
   factory BinaryAcknowledge.fromEncoded(String encoded) {
     String binary = encoded.padRight(168, '0');
 

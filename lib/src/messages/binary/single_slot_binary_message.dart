@@ -3,15 +3,59 @@ import 'dart:typed_data';
 import 'package:ais_decoder/ais_decoder.dart';
 import '../../utils/getInt.dart';
 
+/// ITU-R M.1371 Message Type 25 — Single Slot Binary Message.
+///
+/// A compact, fixed-length (168-bit) binary message that fits in a single TDMA
+/// slot and carries no Communications State word. It may be either addressed
+/// (point-to-point) or broadcast depending on [destinationIndicator], and the
+/// payload may carry a structured application identifier ([dac] / [fid]) when
+/// [binaryDataFlag] is `1`.
+///
+/// Field presence rules:
+/// - [destinationMmsi] is only present when [destinationIndicator] is `1`.
+/// - [applicationId], [dac], and [fid] are only present when [binaryDataFlag]
+///   is `1`.
+///
+/// The raw [data] bytes are provided as-is; interpreting their content
+/// requires knowledge of the specific DAC/FID application standard (when
+/// [binaryDataFlag] is `1`), or a proprietary format otherwise.
 class SingleSlotBinaryMessage extends AISMessage {
+  /// Destination indicator flag.
+  ///
+  /// `1` means the message is addressed to [destinationMmsi];
+  /// `0` means it is a broadcast with no specific destination.
   final int destinationIndicator;
+
+  /// Binary data flag.
+  ///
+  /// `1` means the payload contains a structured application message
+  /// identified by [dac] and [fid]; `0` means unstructured binary data.
   final int binaryDataFlag;
+
+  /// MMSI of the intended recipient, or `null` when [destinationIndicator]
+  /// is `0` (broadcast).
   final int? destinationMmsi;
+
+  /// Combined 16-bit application identifier (DAC in the high 10 bits, FID in
+  /// the low 6 bits), or `null` when [binaryDataFlag] is `0`.
   final int? applicationId;
+
+  /// Designated Area Code (DAC) extracted from [applicationId], or `null`
+  /// when [binaryDataFlag] is `0`.
   final int? dac;
+
+  /// Function Identifier (FID) extracted from [applicationId], or `null`
+  /// when [binaryDataFlag] is `0`.
   final int? fid;
+
+  /// Raw application-specific payload bytes. Decode according to the
+  /// application standard identified by [dac] and [fid] when
+  /// [binaryDataFlag] is `1`.
   final Uint8List data;
 
+  /// Creates a [SingleSlotBinaryMessage] with all fields supplied explicitly.
+  ///
+  /// Prefer [SingleSlotBinaryMessage.fromEncoded] for decoding a real AIS payload.
   SingleSlotBinaryMessage({
     required super.messageType,
     required super.mmsi,
@@ -60,6 +104,12 @@ class SingleSlotBinaryMessage extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Destination Indicator: $destinationIndicator, Binary Data Flag: $binaryDataFlag, Destination MMSI: $destinationMmsi, Application ID: $applicationId, DAC: $dac, FID: $fid, Data: $data)';
   //endregion  
 
+  /// Decodes a six-bit-armored AIS payload string into a
+  /// [SingleSlotBinaryMessage].
+  ///
+  /// [encoded] must be the payload field of a Type 25 NMEA sentence. The
+  /// string is zero-padded to 168 bits (the fixed frame length) before
+  /// parsing.
   factory SingleSlotBinaryMessage.fromEncoded(String encoded) {
     String binary = encoded.padRight(168, '0');
 

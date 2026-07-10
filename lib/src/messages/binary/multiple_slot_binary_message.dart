@@ -3,16 +3,64 @@ import 'dart:typed_data';
 import 'package:ais_decoder/ais_decoder.dart';
 import '../../utils/getInt.dart';
 
+/// ITU-R M.1371 Message Type 26 — Multiple Slot Binary Message with
+/// Communications State.
+///
+/// A variable-length binary message that occupies multiple TDMA slots and
+/// always carries a 20-bit SOTDMA/ITDMA radio status word appended after the
+/// payload. It may be either addressed (point-to-point) or broadcast depending
+/// on [destinationIndicator], and the payload may carry a structured
+/// application identifier ([dac] / [fid]) when [binaryDataFlag] is `1`.
+///
+/// Field presence rules:
+/// - [destinationMmsi] is only present when [destinationIndicator] is `1`.
+/// - [applicationId], [dac], and [fid] are only present when [binaryDataFlag]
+///   is `1`.
+///
+/// The raw [data] bytes are provided as-is; interpreting their content
+/// requires knowledge of the specific DAC/FID application standard (when
+/// [binaryDataFlag] is `1`), or a proprietary format otherwise.
 class MultipleSlotBinaryMessage extends AISMessage {
+  /// Destination indicator flag.
+  ///
+  /// `1` means the message is addressed to [destinationMmsi];
+  /// `0` means it is a broadcast with no specific destination.
   final int destinationIndicator;
+
+  /// Binary data flag.
+  ///
+  /// `1` means the payload contains a structured application message
+  /// identified by [dac] and [fid]; `0` means unstructured binary data.
   final int binaryDataFlag;
+
+  /// MMSI of the intended recipient, or `null` when [destinationIndicator]
+  /// is `0` (broadcast).
   final int? destinationMmsi;
+
+  /// Combined 16-bit application identifier (DAC in the high 10 bits, FID in
+  /// the low 6 bits), or `null` when [binaryDataFlag] is `0`.
   final int? applicationId;
+
+  /// Designated Area Code (DAC) extracted from [applicationId], or `null`
+  /// when [binaryDataFlag] is `0`.
   final int? dac;
+
+  /// Function Identifier (FID) extracted from [applicationId], or `null`
+  /// when [binaryDataFlag] is `0`.
   final int? fid;
+
+  /// Raw application-specific payload bytes. Decode according to the
+  /// application standard identified by [dac] and [fid] when
+  /// [binaryDataFlag] is `1`.
   final Uint8List data;
+
+  /// 20-bit SOTDMA/ITDMA radio status word appended at the end of the
+  /// variable-length frame.
   final int radioStatus;
 
+  /// Creates a [MultipleSlotBinaryMessage] with all fields supplied explicitly.
+  ///
+  /// Prefer [MultipleSlotBinaryMessage.fromEncoded] for decoding a real AIS payload.
   MultipleSlotBinaryMessage({
     required super.messageType,
     required super.mmsi,
@@ -64,6 +112,13 @@ class MultipleSlotBinaryMessage extends AISMessage {
   String toString() => 'AISMessage(Type: $messageType, MMSI: $mmsi, Repeat: $repeatIndicator, Destination Indicator: $destinationIndicator, Binary Data Flag: $binaryDataFlag, Destination MMSI: $destinationMmsi, Application ID: $applicationId, DAC: $dac, FID: $fid, Data: $data, Radio Status: $radioStatus)';
   //endregion  
 
+  /// Decodes a six-bit-armored AIS payload string into a
+  /// [MultipleSlotBinaryMessage].
+  ///
+  /// [encoded] must be the payload field of a Type 26 NMEA sentence. The
+  /// string is zero-padded to 1064 bits before parsing. The data field bounds
+  /// and [radioStatus] position are computed dynamically from the actual
+  /// trimmed payload length because Type 26 is variable-length.
   factory MultipleSlotBinaryMessage.fromEncoded(String encoded) {
     String binary = encoded.padRight(1064, '0');
 
