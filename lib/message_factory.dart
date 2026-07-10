@@ -4,6 +4,10 @@ import 'package:ais_decoder/src/messages/binary/binary_addressed_message.dart';
 import 'package:ais_decoder/src/messages/binary/binary_broadcast_message.dart';
 import 'package:ais_decoder/src/messages/binary/multiple_slot_binary_message.dart';
 import 'package:ais_decoder/src/messages/binary/single_slot_binary_message.dart';
+import 'package:ais_decoder/src/messages/network/assignment_mode_command.dart';
+import 'package:ais_decoder/src/messages/network/data_link_management_message.dart';
+import 'package:ais_decoder/src/messages/network/dgnss_broadcast_binary_message.dart';
+import 'package:ais_decoder/src/messages/network/interrogation.dart';
 import 'package:ais_decoder/src/messages/position/sar_aircraft_position_report.dart';
 import 'package:ais_decoder/src/messages/safety/addressed_safety_related_message.dart';
 import 'package:ais_decoder/src/messages/safety/safety_related_acknowledgement.dart';
@@ -105,6 +109,12 @@ class MessageFactory {
           25 => SingleSlotBinaryMessage.fromEncoded(encoded),
           26 => MultipleSlotBinaryMessage.fromEncoded(encoded),
 
+        // Network messages
+          15 => InterrogationMessage.fromEncoded(encoded),
+          16 => AssignmentModeCommand.fromEncoded(encoded),
+          17 => DgnssBroadcastBinaryMessage.fromEncoded(encoded),
+          20 => DataLinkManagementMessage.fromEncoded(encoded),
+
         // Time messages
           10 => UtcDateInquiry.fromEncoded(encoded),
           11 => UtcDateResponse.fromEncoded(encoded),
@@ -142,7 +152,7 @@ class MessageFactory {
 
   // Helper method to check if a message type is supported ToDo: Update
   static bool isSupported(int messageType) {
-    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 18, 19, 24, 25, 26, 27].contains(messageType);
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 25, 26, 27].contains(messageType);
   }
   static bool isSupportedByLegacy(int messageType) {
     return [1, 2, 3, 4, 5, 18, 19, 24, 27].contains(messageType);
@@ -150,6 +160,6 @@ class MessageFactory {
 
   // Helper method to get supported message types ToDo: Update
   static List<int> getSupportedTypes() {
-    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 18, 19, 24, 25, 26, 27];
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 25, 26, 27];
   }
 }
