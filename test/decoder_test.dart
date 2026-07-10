@@ -104,7 +104,6 @@ void main() {
   group('Type 5', () {
     test('example 1', () {
       final message = AISMessage.fromString(kType5Example1Line1);
-      // TODO: combine with line 2 somehow.
       expect(message, isNotNull);
       expect(message.messageType, 5);
       expect(message.mmsi, 370824000);
@@ -133,7 +132,6 @@ void main() {
     });
     test('example 2', () {
       final message = AISMessage.fromString(kType5Example2Line1);
-      // TODO: combine with line 2 somehow.
       expect(message, isNotNull);
       expect(message.messageType, 5);
       expect(message.mmsi, 237005900);

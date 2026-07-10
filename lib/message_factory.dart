@@ -3,8 +3,6 @@ import 'package:ais_decoder/src/utils/getInt.dart';
 import 'src/utils/convert_char_to_bin.dart';
 import 'src/utils/debug_prints.dart';
 
-
-
 // ToDo: (For Release) Needs Extensive Documentation
 // ToDo: (High Priority) Currently only can deal with single Fragment style AIS Sentences. Needs to be updated to also support sentences with more than one fragment!
 // ToDo: (Medium Priority) isPayload should be later moved into a separate function if any more parameters become necessary, fine for now - for later documentation: isPayload bypasses the String splitting via , and just passes the payload directly into encoded.
@@ -137,7 +135,7 @@ class MessageFactory {
     }
   }
 
-  // Helper method to check if a message type is supported ToDo: Update
+  // Helper method to check if a message type is supported
   static bool isSupported(int messageType) {
     return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27].contains(messageType);
   }
@@ -145,7 +143,7 @@ class MessageFactory {
     return [1, 2, 3, 4, 5, 18, 19, 24, 27].contains(messageType);
   }
 
-  // Helper method to get supported message types ToDo: Update
+  // Helper method to get supported message types
   static List<int> getSupportedTypes() {
     return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27];
   }

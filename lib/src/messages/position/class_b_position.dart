@@ -2,8 +2,6 @@ import '../../../ais_decoder.dart';
 import '../../utils/coordinate_utils.dart';
 import '../../utils/getInt.dart';
 
-
-// ToDo: Implement missing 9 possibly sent data points!
 class StandardClassBCSPositionReport extends AISMessage {
 
   final double? latitude;
