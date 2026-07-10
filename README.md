@@ -20,6 +20,8 @@ This library decodes NMEA AIS sentences (AIVDM format) into structured Dart obje
 - **Type 4**: Base Station Messages
 - **Type 5**: Static and Voyage Related Data
 - **Type 6, 7, 8**: Binary Messages
+- **Type 9**: SAR Aircraft Position Reports
+- **Type 10, 11**: UTC Date Inquiry and Response
 - **Type 18, 19**: Standard Class B Position Reports
 - **Type 24**: Static Data Reports (multipart)
 - **Type 27**: Long Range AIS Broadcast Messages
@@ -94,15 +96,15 @@ Integrates neatly with the ```nmea``` package.
 
 For Multipart message decoding (Type 5) please combine the two payloads manually.
 
-(Example):  !AIVDM,2,1,0,B,55M67F@000004?78000P59HET0000000000000001P,0*0C 
+(Example):  ```!AIVDM,2,1,0,B,55M67F@000004?78000P59HET0000000000000001P,0*0C```
 
 plus
 
-!AIVDM,2,2,0,B,<<<70P0N4m1E52CP00,2*3B
+```!AIVDM,2,2,0,B,<<<70P0N4m1E52CP00,2*3B```
     
 become
-        
-!AIVDM,2,1,0,B,55M67F@000004?78000P59HET0000000000000001P<<<70P0N4m1E52CP00,0*20
+
+```!AIVDM,2,1,0,B,55M67F@000004?78000P59HET0000000000000001P<<<70P0N4m1E52CP00,0*20```
 
 A utility class for this will be provided in a future release.
 

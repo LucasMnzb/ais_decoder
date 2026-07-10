@@ -1,4 +1,5 @@
 import 'package:ais_decoder/ais_decoder.dart';
+import 'package:ais_decoder/src/messages/position/sar_aircraft_position_report.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -177,6 +178,20 @@ void main() {
       expect(message8.mmsi, 366999712);
     });
   });
+  group('Type 9', () {
+    test('example 1', () {
+      final message = AISMessage.fromString(kType9Example1);
+      expect(message, isNotNull);
+      expect(message.messageType, 9);
+      expect(message.mmsi, 111232511);
+      expect(message.repeatIndicator, 0);
+      expect(message, isA<SarAircraftPositionReport>());
+      final typed = message as SarAircraftPositionReport;
+      expect(typed.altitude, 303);
+      expect(typed.latitude, 58.144);
+      expect(typed.longitude, -6.278843);
+    });
+  });
   group('Type 18', () {
     test('example 1', () {
       final message = AISMessage.fromString(kType18Example1);
@@ -346,6 +361,8 @@ const kType5Example2Line2 = '!AIVDM,2,2,1,A,kQ2H8888880,2*65';
 const kType6Example1 = '!AIVDM,1,1,,B,6B?n;be:cbapalgc;i6?Ow4,2*4A';
 const kType7Example1 = '!AIVDM,1,1,,A,702R5`hwCjq8,0*6B';
 const kType8Example1 = '!AIVDM,1,1,,A,85Mwp`1Kf3aCnsNvBWLi=wQuNhA5t43N`5nCuI=p<IBfVqnMgPGs,0*47';
+
+const kType9Example1 = '!AIVDM,1,1,,B,91b55wi;hbOS@OdQAC062Ch2089h,0*30';
 
 const kType18Example1 = '!AIVDM,1,1,,B,B3`e<W@01hJMcvUIe3rWSwnUoP06,0*48';
 const kType18Example2 = '!AIVDM,1,1,,A,B46CbvP008JN885IfS;Q3wsUoP06,0*25';
