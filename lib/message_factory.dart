@@ -99,6 +99,8 @@ class MessageFactory {
           16 => AssignmentModeCommand.fromEncoded(encoded),
           17 => DgnssBroadcastBinaryMessage.fromEncoded(encoded),
           20 => DataLinkManagementMessage.fromEncoded(encoded),
+          22 => ChannelManagementMessage.fromEncoded(encoded),
+          23 => GroupAssignmentCommand.fromEncoded(encoded),
 
         // Time messages
           10 => UtcDateInquiry.fromEncoded(encoded),
@@ -137,7 +139,7 @@ class MessageFactory {
 
   // Helper method to check if a message type is supported ToDo: Update
   static bool isSupported(int messageType) {
-    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 24, 25, 26, 27].contains(messageType);
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27].contains(messageType);
   }
   static bool isSupportedByLegacy(int messageType) {
     return [1, 2, 3, 4, 5, 18, 19, 24, 27].contains(messageType);
@@ -145,6 +147,6 @@ class MessageFactory {
 
   // Helper method to get supported message types ToDo: Update
   static List<int> getSupportedTypes() {
-    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 24, 25, 26, 27];
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27];
   }
 }

@@ -14,7 +14,7 @@ This library decodes NMEA AIS sentences (AIVDM format) into structured Dart obje
 - **Coordinate precision**: Proper handling of different coordinate encodings
 - **Extensible**: Clean architecture for adding new message types
 
-## Currently Supported Message Types
+## Currently Supported Message Types (full ITU-R M.1371)
 
 - **Type 1, 2, 3**: Position Reports (Class A vessels)
 - **Type 4**: Base Station Messages
@@ -27,13 +27,14 @@ This library decodes NMEA AIS sentences (AIVDM format) into structured Dart obje
 - **Type 18, 19**: Standard Class B Position Reports
 - **Type 20**: Data Link Management Messages
 - **Type 21**: Aid to Navigation Messages
+- **Type 22, 23**: Channel Management and Group Assignment Messages
 - **Type 24**: Static Data Reports (multipart)
 - **Type 25, 26**: Single and Multiple Slot Binary Messages
 - **Type 27**: Long Range AIS Broadcast Messages
 
 ## Roadmap
 
-- [ ] All 27+ standard AIS message types
+- [x] All 27+ standard AIS message types
 - [x] Binary message support (Types 6, 8)
 - [x] Specialized Binary message support (Types 25, 26)
 - [x] Aid to Navigation messages (Type 21)

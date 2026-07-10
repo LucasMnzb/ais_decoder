@@ -32,6 +32,8 @@ export 'src/messages/network/interrogation.dart';
 export 'src/messages/network/assignment_mode_command.dart';
 export 'src/messages/network/dgnss_broadcast_binary_message.dart';
 export 'src/messages/network/data_link_management_message.dart';
+export 'src/messages/network/channel_management.dart';
+export 'src/messages/network/group_assignment_command.dart';
 
 // safety
 export 'src/messages/safety/addressed_safety_related_message.dart';

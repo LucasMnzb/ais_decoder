@@ -758,4 +758,55 @@ class BinaryConverter {
     }
   }
   //endregion
+
+  //region TxRx Type Info
+  /// Get an info on the Transmit mode type - used in ais type 22 & 23.
+  String? transmitModeInfoDirect(int transmitMode) {
+    return switch (transmitMode) {
+      0 => "TxA/TxB, RxA/RxB",
+      1 => "TxA, RxA/RxB",
+      2 => "TxB, RxA/RxB",
+      3 => "Reserved for Future Use",
+      _ => "Unknown"
+    };
+  }
+//endregion
+
+  //region Station Type Info
+    /// Get an info on the Transmit mode type - used in ais type 22 & 23.
+    String? stationTypeInfoDirect(int stationType) {
+      return switch (stationType) {
+        0 => "All types of mobiles (default)",
+        1 => "Reserved for Future Use",
+        2 => "All types of Class B mobile stations",
+        3 => "SAR airborne mobile station",
+        4 => "Aid to Navigation station",
+        5 => "Class B shipborne mobile station (IEC62287 only)",
+        6 || 7 || 8 || 9 => "Regional use and inland waterways",
+        10 || 11 || 12 || 13 || 14 || 15 => "Reserved for future use",
+        _ => "Unknown"
+      };
+    }
+  //endregion
+
+  //region Station Interval Info
+    /// Get an info on the Interval of the station data sent - used in ais type 22 & 23.
+    String? stationIntervalInfo(int stationInterval) {
+      return switch (stationInterval) {
+        0 => "As given by the autonomous mode",
+        1 => "10 Minutes",
+        2 => "6 Minutes",
+        3 => "3 Minutes",
+        4 => "1 Minute",
+        5 => "30 Seconds",
+        6 => "15 Seconds",
+        7 => "10 Seconds",
+        8 => "5 Seconds",
+        9 => "Next Shorter Reporting Interval",
+        10 => "Next Longer Reporting Interval",
+        11 || 12 || 13 || 14 || 15 => "Reserved for future use",
+        _ => "Unknown"
+      };
+    }
+  //endregion
 }
